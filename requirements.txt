@@ -1,2 +1,0 @@
-pillow==4.0.0
-easygui==0.98.1
