@@ -5,17 +5,17 @@ Created on 17 Apr 2017
 '''
 from os.path import expanduser
 import pygame
-import PatientProcessor 
-import tkinter as tk
 import os
+import PatientProcessor
+import sys
+from utils import commands
 
 home = expanduser("~")
 
-root = tk.Tk()
-embed = tk.Frame(root)
-os.environ['SDL_WINDOWID'] = str(embed.winfo_id())
-
 #path = gui.fileopenbox("Select the image", "Image selection", default="./images",
 #                     filetypes=["*.jpg", "*.jpeg", "*.png", "*.gif", "*.bmp"])
-# print(path)
-#PatientProcessor.load(pygame, "")
+path = os.path.join("images", "1.JPG")
+print(path)
+command = PatientProcessor.load(pygame, path)
+if command == commands.EXIT:
+    sys.exit()

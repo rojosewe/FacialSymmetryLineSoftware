@@ -4,14 +4,16 @@ Created on 17 Apr 2017
 @author: rweffercifue
 '''
 
-import os
 from geometry import Rect
 from facial_measures import Face, Order
 from geometry import Point, Line, Mark
 from utils import colors as cs
+from utils import commands
 from pygame import draw as d
 
-complete = 1
+max_v = 700
+
+complete = 0
 img = None
 size = None
 screen = None
@@ -20,10 +22,16 @@ lines = []
 marks = []
 f = Face()
 
-def init(pygame):
+def init(pygame, path):
     global  img, size
-    img = pygame.image.load(os.path.join("images", "images.jpeg"))
+    img = pygame.image.load(path)
     size = img.get_rect().size
+    w = size[0]
+    h = size[1]
+    proportion = w/h
+    h = min(max_v, h)
+    w = int(h * proportion)
+    img = pygame.transform.scale(img, (w, h))
     
 def load(screen_main, left, top, right, bottom):
     global screen, rect
@@ -88,17 +96,37 @@ def getFacepos(p, pos):
                 f.cheekR = p
             
             if pos > 0:
-                marks.append(Mark(p))
+                marks.append(Mark(p, r = 4, color = cs.GREEN))
             print(Order.order[pos])
             pos += 1
             return True
         else:
             return False
     else:
-        print("complete")
-        complete = 0
+        if complete == 0:
+            print("complete")
+            complete = 1
+            processFullPatient(f)
         return False
     
 def processClick(event, point, pos):
     return getFacepos(point, pos)
+
+def processKey(pg, event):
+    if event.key == pg.K_k:
+        return commands.DELETE_MARK
+    elif event.key == pg.K_c:
+        return commands.CLEAR_MARKS
+    elif event.key == pg.K_KP_ENTER:
+        if complete == 1:
+            processFullPatient()
+            
+def processFullPatient(f):
+    print("Measured!")
+    
+    
+def clean():
+    lines.clear()
+    marks.clear()
+    f = Face()
     
