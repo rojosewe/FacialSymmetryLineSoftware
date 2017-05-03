@@ -9,6 +9,7 @@ import os
 import PatientProcessor
 import sys
 from utils import commands
+from  facial_measures import Patient
 
 home = expanduser("~")
 
@@ -16,6 +17,6 @@ home = expanduser("~")
 #                     filetypes=["*.jpg", "*.jpeg", "*.png", "*.gif", "*.bmp"])
 path = os.path.join("images", "1.JPG")
 print(path)
-command = PatientProcessor.load(pygame, path)
+command = PatientProcessor.load(pygame, Patient("John doe", path, None))
 if command == commands.EXIT:
     sys.exit()

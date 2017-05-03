@@ -10,10 +10,10 @@ def getPoint():
 
 pos = 0
 
-def load(pygame, path):
+def load(pygame, patient):
     global pos
     Reference.init(pygame)
-    Workspace.init(pygame, path)
+    Workspace.init(pygame, patient.photo)
     
     left = 0
     top = 0
@@ -34,18 +34,32 @@ def load(pygame, path):
             if event.type == pygame.QUIT: 
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONUP:
-                if Workspace.processClick(event, p, pos):
+                command = Workspace.processClick(event, p, pos)
+                print(command)
+                if command == commands.NEXT:
                     pos += 1
+                elif command == commands.MEASUREMENTS_DONE:
+                    continue
                 Reference.processClick(event, p, pos)
             elif event.type == pygame.KEYUP:
                 command = Workspace.processKey(pygame, event)
                 if command == commands.DELETE_MARK:
                     pos = max(pos - 1, 0)
-                if command == commands.CLEAR_MARKS:
+                    Workspace.deleteLastMark()
+                elif command == commands.CLEAR_MARKS:
                     pos = 0
                     Workspace.clean()
-                if command == None:
+                elif command == commands.CLEAR_MARKS:
+                    processPatient(patient, Workspace.measurements, Workspace.angles)
+                elif command == None:
                     if event.key == pygame.K_q:
                         return commands.EXIT
                     
-        pygame.display.flip()    
+        pygame.display.flip()
+        
+def processPatient(patient, measurements, angles):
+    print(patient)
+    print(measurements)
+    print(angles)
+        
+    
