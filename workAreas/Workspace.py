@@ -8,7 +8,7 @@ from geometry import Rect
 from facial_measures import Face, Order
 from geometry import Point, Line, Mark
 from utils import colors as cs
-from utils import commands
+from utils import Commands
 from pygame import draw as d
 import facial_measures
 
@@ -23,13 +23,12 @@ rect = None
 guideline = []
 vertical = []
 marks = []
-f = Face()
-measurements = None
-angles = None
+patient = None
 
-def init(pygame, path):
-    global  img, size
-    img = pygame.image.load(path)
+def init(pygame, patient_value):
+    global  img, size, patient
+    patient = patient_value
+    img = pygame.image.load(patient.photo)
     size = img.get_rect().size
     w = size[0]
     h = size[1]
@@ -82,50 +81,49 @@ def getFacepos(p, pos):
                 # set center
                 guideline.append(Line(Point(p.x, rect.top), Point(p.x, rect.bottom), color = cs.RED))
             elif x == Order.TOP_HEAD:
-                f.upper = p
+                patient.face.upper = p
             elif x == Order.CHIN:
-                f.chin = p
-                vertical.append(Line(f.upper, f.chin, color=cs.LIGHT, w=1))
+                patient.face.chin = p
+                vertical.append(Line(patient.face.upper, patient.face.chin, color=cs.LIGHT, w=1))
             elif x == Order.FOREHEAD:
-                f.middle = p
+                patient.face.middle = p
             elif x == Order.EYE_OUTER_LEFT:
-                f.outer_eyeL = p
+                patient.face.outer_eyeL = p
             elif x == Order.EYE_INNER_LEFT:
-                f.inner_eyeL = p
+                patient.face.inner_eyeL = p
             elif x == Order.EYE_INNER_RIGHT:
-                f.inner_eyeR = p
+                patient.face.inner_eyeR = p
             elif x == Order.EYE_OUTER_RIGHT:
-                f.outer_eyeR = p
+                patient.face.outer_eyeR = p
             elif x == Order.CHEEKBONE_LEFT:
-                f.cheekboneL = p
+                patient.face.cheekboneL = p
             elif x == Order.CHEEKBONE_RIGHT:
-                f.cheekboneR = p
+                patient.face.cheekboneR = p
             elif x == Order.NOSE_LEFT:
-                f.noseL = p
+                patient.face.noseL = p
             elif x == Order.NOSE_RIGHT:
-                f.noseR = p
+                patient.face.noseR = p
             elif x == Order.MOUTH_LEFT:
-                f.mouthL = p
+                patient.face.mouthL = p
             elif x == Order.MOUTH_RIGHT:
-                f.mouthR = p
+                patient.face.mouthR = p
             elif x == Order.CHEEK_LEFT:
-                f.cheekL = p
+                patient.face.cheekL = p
             elif x == Order.CHEEK_RIGHT:
-                f.cheekR = p
+                patient.face.cheekR = p
             
             if pos > 0:
                 marks.append(Mark(p, r = 4, color = cs.GREEN))
             print(Order.order[pos])
             pos += 1
-            return commands.NEXT
+            return Commands.NEXT
         else:
-            return commands.OUT_OF_BOUNDS
+            return Commands.OUT_OF_BOUNDS
     if complete == 0:
-        processFullPatient(f)
         complete = 1
-        return commands.MEASUREMENTS_DONE
+        return Commands.MEASUREMENTS_DONE
     elif complete == 1:
-        return commands.MEASUREMENTS_DONE_REP
+        return Commands.MEASUREMENTS_DONE_REP
     
 def processClick(event, point, pos):
     print("Processing")
@@ -133,27 +131,27 @@ def processClick(event, point, pos):
 
 def processKey(pg, event):
     if event.key == pg.K_d:
-        return commands.DELETE_MARK
+        return Commands.DELETE_MARK
     elif event.key == pg.K_c:
-        return commands.CLEAR_MARKS
+        return Commands.CLEAR_MARKS
     elif event.key == pg.K_KP_ENTER:
         if complete == 1:
             print("1")
             processFullPatient()
-            return commands.MEASUREMENTS_DONE
+            return Commands.MEASUREMENTS_DONE
         else:
             print("0")
             
-def processFullPatient(f):
-    global measurements, angles
-    measurements = facial_measures.Measurements(f)
-    angles = facial_measures.Angles(f)
-    print("Measured!")
-    
+def processFullPatient(patient):
+    patient.measurements = facial_measures.Measurements()
+    patient.angles = facial_measures.Angles()
+    patient.measurements.calculate(patient.face)
+    patient.angles.calulate(patient.face)
+    return patient
     
 def clean():
     guideline.clear()
     vertical.clear()
     marks.clear()
-    f = Face()
+    patient.face = Face()
     

@@ -1,13 +1,15 @@
 
-import easygui as gui
-import sys 
-from utils import commands
-from facial_measures import Patient
-from facial_measures import Face
-from os.path import expanduser
-import os
-import PatientProcessor
 from email.policy import default
+import os
+from os.path import expanduser
+import sys 
+
+import PatientProcessor
+import easygui as gui
+from facial_measures import Face
+from facial_measures import Patient
+from utils import Commands
+
 
 home = expanduser("~")
 pygame = None
@@ -17,9 +19,9 @@ def makeInitialSelection():
     action = gui.indexbox("Choose an option.", choices=("Create new patient", "Open existing one", "Exit"), 
                         default_choice="Create new patient", cancel_choice="Exit")
     if action == 0:
-        return commands.CREATE
+        return Commands.CREATE
     elif action == 1:
-        return commands.OPEN
+        return Commands.OPEN
     elif action == 2:
         sys.exit()
         
@@ -33,7 +35,7 @@ def selectPatient():
     choices = ["Vanilla", "Chocolate", "Strawberry", "Rocky Road"]
     choice = gui.choicebox(msg, title, choices)
     if choice == None:
-        return commands.START
+        return Commands.START
     else:
         return openPatient(choice)
 
@@ -42,24 +44,24 @@ def savePatient(patient):
     save = gui.boolbox(text, "Patient measures save?", ["Save", "Cancel"])
     if save:
         gui.msgbox("The patient has been saved", "Saved")
-        return commands.START
+        return Commands.START
     else:
         if gui.boolbox("You said not to save, this will delete the progress for this patient. Are you sure?", 
                     "Cancel?", ["Yes", "No"]):
-            return commands.START
+            return Commands.START
         else:
-            return commands.SAVE
+            return Commands.SAVE
     
 def executeGUICommand(command):
-    if command == commands.START:
+    if command == Commands.START:
         command = makeInitialSelection()
-    elif command == commands.CREATE:
+    elif command == Commands.CREATE:
         command = fillPatientInfo()
-    elif command == commands.OPEN:
+    elif command == Commands.OPEN:
         command = selectPatient()
-    elif command == commands.SAVE:
+    elif command == Commands.SAVE:
         command = savePatient(None)
-    elif command == commands.EXIT:
+    elif command == Commands.EXIT:
         sys.exit()
     return command
 
@@ -67,7 +69,7 @@ def start(home_path, pygame_x):
     global home, pygame
     home = home_path
     pygame = pygame_x
-    command = commands.START
+    command = Commands.START
     while 1:
         command = executeGUICommand(command)
 
@@ -83,9 +85,9 @@ def fillPatientInfo():
     name = gui.enterbox("Enter the patient information", "Patient information", default)
     patient_name = name
     if name is None:
-        return commands.START
+        return Commands.START
     image = selectImage()
     if image is None:
-        return commands.CREATE
+        return Commands.CREATE
     patient = Patient(name, image, Face())
     PatientProcessor.load(pygame, patient)

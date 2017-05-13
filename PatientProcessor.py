@@ -2,7 +2,7 @@ import sys
 from pygame import mouse as m
 from geometry import Point
 from workAreas import Reference, Workspace
-from utils import commands
+from utils import Commands, Loader
 
 def getPoint():
     p = m.get_pos()
@@ -13,7 +13,7 @@ pos = 0
 def load(pygame, patient):
     global pos
     Reference.init(pygame)
-    Workspace.init(pygame, patient.photo)
+    Workspace.init(pygame, patient)
     
     left = 0
     top = 0
@@ -37,30 +37,25 @@ def load(pygame, patient):
             elif event.type == pygame.MOUSEBUTTONUP:
                 command = Workspace.processClick(event, p, pos)
                 print(command)
-                if command == commands.NEXT:
+                if command == Commands.NEXT:
                     pos += 1
-                elif command == commands.MEASUREMENTS_DONE:
+                elif command == Commands.MEASUREMENTS_DONE_REP:
                     continue
+                elif command == Commands.MEASUREMENTS_DONE:
+                    patient = Workspace.processFullPatient(patient)
+                    Loader.savePatient(patient)
                 Reference.processClick(event, p, pos)
             elif event.type == pygame.KEYUP:
                 command = Workspace.processKey(pygame, event)
-                if command == commands.DELETE_MARK:
+                if command == Commands.DELETE_MARK:
                     pos = max(pos - 1, 0)
                     Workspace.deleteLastMark()
-                elif command == commands.CLEAR_MARKS:
+                elif command == Commands.CLEAR_MARKS:
                     pos = 0
                     Workspace.clean()
-                elif command == commands.CLEAR_MARKS:
-                    processPatient(patient, Workspace.measurements, Workspace.angles)
                 elif command == None:
                     if event.key == pygame.K_q:
-                        return commands.EXIT
+                        return Commands.EXIT
                     
-        pygame.display.flip()
-        
-def processPatient(patient, measurements, angles):
-    print(patient)
-    print(measurements)
-    print(angles)
-        
+        pygame.display.flip()        
     

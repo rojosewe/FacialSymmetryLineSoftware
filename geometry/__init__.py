@@ -11,7 +11,7 @@ class Point:
         return (self.x, self.y)
     
     def __str__(self):
-        return str((self.x, self.x))
+        return str((self.x, self.y))
 
 class Line:
 
@@ -29,9 +29,9 @@ class Line:
         return (self.p1.x, self.p2.x) + "," + (self.p1.y, self.p2.y)
     
     def getFormulaicValues(self):
-        A = (self.p1[1] - self.p2[1])
-        B = (self.p2[0] - self.p1[0])
-        C = (self.p1[0]*self.p2[1] - self.p2[0]*self.p1[1])
+        A = (self.p1.y - self.p2.y)
+        B = (self.p2.x - self.p1.x)
+        C = (self.p1.x * self.p2.y - self.p2.x * self.p1.y)
         return A, B, -C
 
 class Mark:
@@ -53,7 +53,7 @@ class Rect:
         self.bottom = bottom
         
 def distance(point1, point2):
-    math.sqrt(math.pow(point2.x - point1.x, 2) + math.pow(point2.y - point1.y, 2))
+    return math.sqrt(math.pow(point2.x - point1.x, 2) + math.pow(point2.y - point1.y, 2))
     
 def intersects(line1, line2):
     lf1 = line1.getFormulaicValues()
