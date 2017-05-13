@@ -19,6 +19,7 @@ def load(pygame, patient):
     top = 0
     right = Reference.size[0] + Workspace.size[0]
     bottom = max(Reference.size[1], Workspace.size[1])
+    print(right)
     screen = pygame.display.set_mode((right, bottom))
     
     Reference.load(screen, left, top, Reference.size[0], Reference.size[1])
