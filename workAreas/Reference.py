@@ -15,19 +15,20 @@ size = None
 screen = None
 rect = None
 
-points = {Order.TOP_HEAD: (96, 41), Order.CHIN: (98, 187)
-, Order.FOREHEAD: (97, 96), Order.EYE_OUTER_LEFT: (56, 103)
-, Order.EYE_INNER_LEFT: (81, 103), Order.EYE_OUTER_RIGHT: (109, 102)
-, Order.EYE_INNER_RIGHT: (132, 100), Order.CHEEKBONE_LEFT: (47, 129)
-, Order.CHEEKBONE_RIGHT: (149, 127), Order.NOSE_LEFT: (81, 128)
-, Order.NOSE_RIGHT: (114, 130), Order.MOUTH_LEFT: (74, 156)
-, Order.MOUTH_RIGHT: (121, 153), Order.CHEEK_LEFT: (58, 176)
-, Order.CHEEK_RIGHT: (140, 174)}
+points = {Order.TOP_HEAD: (100, 56), Order.CHIN: (100, 228), 
+Order.FOREHEAD: (100, 105), Order.EYE_OUTER_LEFT: (55, 123), 
+Order.EYE_INNER_LEFT: (92, 119), Order.EYE_OUTER_RIGHT: (114, 119), 
+Order.EYE_INNER_RIGHT: (150, 123), Order.CHEEKBONE_LEFT: (30, 140), 
+Order.CHEEKBONE_RIGHT: (176, 143), Order.NOSE_LEFT: (80, 151), 
+Order.NOSE_RIGHT: (123, 152), Order.MOUTH_LEFT: (78, 181), 
+Order.MOUTH_RIGHT: (125, 181), Order.CHEEK_LEFT: (48, 209), 
+Order.CHEEK_RIGHT: (155, 207)}
 
 def init(pygame):
     global  img, size
-    img = pygame.image.load(os.path.join("images", "images.jpeg"))
+    img = pygame.image.load(os.path.join("images", "reference.jpeg"))
     size = img.get_rect().size
+    return (size[0], size[1])
     
 def load(screen_main, left, top, right, bottom):
     global screen, rect
@@ -44,4 +45,4 @@ def draw(p, pos):
         if x in points:
             refPoint = points[x]
             refPoint = (refPoint[0], refPoint[1])
-            d.circle(screen, cs.GREEN, refPoint, 4)
+            d.circle(screen, cs.RED, refPoint, 4)

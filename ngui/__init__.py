@@ -8,7 +8,7 @@ import PatientProcessor
 import easygui as gui
 from facial_measures import Face
 from facial_measures import Patient
-from utils import Commands
+from utils import Commands, Loader, CSV
 
 
 home = expanduser("~")
@@ -16,13 +16,15 @@ pygame = None
 patient_name = None
 
 def makeInitialSelection():
-    action = gui.indexbox("Choose an option.", choices=("Create new patient", "Open existing one", "Exit"), 
+    action = gui.indexbox("Choose an option.", choices=("Create new patient", "Open existing one", "Export the database to csv", "Exit"), 
                         default_choice="Create new patient", cancel_choice="Exit")
     if action == 0:
         return Commands.CREATE
     elif action == 1:
         return Commands.OPEN
     elif action == 2:
+        return Commands.EXPORT
+    elif action == 3:
         sys.exit()
         
 def selectImage():
@@ -32,7 +34,7 @@ def selectImage():
 def selectPatient():
     msg ="Select the patient"
     title = "Patients"
-    choices = ["Vanilla", "Chocolate", "Strawberry", "Rocky Road"]
+    choices = Loader.getAllPatientsNames()
     choice = gui.choicebox(msg, title, choices)
     if choice == None:
         return Commands.START
@@ -51,6 +53,15 @@ def savePatient(patient):
             return Commands.START
         else:
             return Commands.SAVE
+        
+def exportDB():
+    location = gui.filesavebox(msg="Choose location to save", title="Save file", default='db.csv', filetypes=["*.csv"])
+    print(location)
+    if not location.endswith(".csv"):
+        location += ".csv"
+    patients = Loader.getAllPatients()
+    CSV.patientsToCSV(patients, location)
+    return Commands.START
     
 def executeGUICommand(command):
     if command == Commands.START:
@@ -61,6 +72,8 @@ def executeGUICommand(command):
         command = selectPatient()
     elif command == Commands.SAVE:
         command = savePatient(None)
+    elif command == Commands.EXPORT:
+        command = exportDB()
     elif command == Commands.EXIT:
         sys.exit()
     return command
@@ -74,8 +87,8 @@ def start(home_path, pygame_x):
         command = executeGUICommand(command)
 
 def openPatient(name):
-    patient = Patient(name, "images/1.JPG", Face())
-    PatientProcessor.load(pygame, patient)
+    patient = Loader.openPatient(name)
+    PatientProcessor.load(pygame, patient, complete=True)
 
 def fillPatientInfo():
     global patient_name
@@ -84,10 +97,12 @@ def fillPatientInfo():
         default = patient_name
     name = gui.enterbox("Enter the patient information", "Patient information", default)
     patient_name = name
+    patient_age = int(gui.enterbox("Enter the patient age", "Patient age", 18))
+    patient_gender = "Male" if gui.indexbox("Gender.", choices=("Male", "Female")) == 0 else "Female"
     if name is None:
         return Commands.START
     image = selectImage()
     if image is None:
         return Commands.CREATE
-    patient = Patient(name, image, Face())
+    patient = Patient(name, patient_age, patient_gender, image, Face())
     PatientProcessor.load(pygame, patient)

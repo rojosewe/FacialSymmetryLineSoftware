@@ -27,15 +27,15 @@ def getExample():
     a = Angles()
     m.calculate(f)
     a.calculate(f)
-    patient = Patient("test1", "images/2.JPG", f, m, a)
+    patient = Patient("test1", 18, "Male", "images/2.JPG", f, m, a)
     return patient
 
-conn = sqlite3.connect('../files/patients.db')
+conn = sqlite3.connect('files/patients.db')
 
 def initdb():
     c = conn.cursor()
     # Create table
-    c.execute('CREATE TABLE IF NOT EXISTS patients (name text, photo text)')
+    c.execute('CREATE TABLE IF NOT EXISTS patients (name text, age real, gender text, photo text)')
     conn.commit()
     c.execute('''CREATE TABLE IF NOT EXISTS face (patient text, 
         middle_x real, upper_x real, chin_x real,
@@ -63,17 +63,20 @@ def initdb():
 
 def insertPatientEntity(patient):
     c = conn.cursor()
-    c.execute('INSERT INTO patients(name, photo) VALUES (?, ?)', (patient.name, patient.photo))
+    c.execute('INSERT INTO patients(name, age, gender, photo) VALUES (?, ?, ?, ?)', 
+              (patient.name, patient.age, patient.gender, patient.photo))
     conn.commit()
 
 def updatePatientEntity(patient):
     c = conn.cursor()
-    c.execute('UPDATE patients SET photo = ? WHERE name = ?', (patient.photo, patient.name))
+    c.execute('UPDATE patients SET photo = ?, age = ?, gender = ? WHERE name = ?', 
+              (patient.photo, patient.age, patient.gender, patient.name))
     conn.commit()
 
 def insertFace(patient):
     c = conn.cursor()
     f = patient.face
+    print(str(f.cheekboneL))
     c.execute('''INSERT INTO face (patient, 
             middle_x, upper_x, chin_x, cheekboneL_x, cheekboneR_x, cheekL_x,
             cheekR_x, mouthL_x, mouthR_x, noseL_x, noseR_x, outer_eyeL_x,
@@ -82,10 +85,11 @@ def insertFace(patient):
             inner_eyeL_y,outer_eyeR_y,inner_eyeR_y) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
             ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-            ?, ?, ?, ?, ?, ?, ?, ?, ?)'''
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'''
             , (patient.name, f.middle.x, f.upper.x , f.chin.x, f.cheekboneL.x, f.cheekboneR.x, f.cheekL.x,
             f.cheekR.x, f.mouthL.x, f.mouthR.x, f.noseL.x, f.noseR.x, f.outer_eyeL.x,
-            f.inner_eyeL.x, f.outer_eyeR.x, f.inner_eyeR.x, f.middle.y, f.upper.y , f.chin.y, f.cheekboneL.y, f.cheekboneR.y, f.cheekL.y,
+            f.inner_eyeL.x, f.outer_eyeR.x, f.inner_eyeR.x, f.middle.y, f.upper.y , f.chin.y, f.cheekboneL.y, 
+            f.cheekboneR.y, f.cheekL.y,
             f.cheekR.y, f.mouthL.y, f.mouthR.y, f.noseL.y, f.noseR.y, f.outer_eyeL.y,
             f.inner_eyeL.y, f.outer_eyeR.y, f.inner_eyeR.y))
     conn.commit()
@@ -110,7 +114,11 @@ def updateFace(patient):
     
 def getFace(name):
     c = conn.cursor()
-    c.execute('SELECT * FROM face WHERE patient=?', (name,))
+    c.execute('''SELECT patient, middle_x, upper_x, chin_x, cheekboneL_x, cheekboneR_x, cheekL_x,
+            cheekR_x, mouthL_x, mouthR_x, noseL_x, noseR_x, outer_eyeL_x,
+            inner_eyeL_x,outer_eyeR_x,inner_eyeR_x, middle_y,upper_y,chin_y,cheekboneL_y,
+            cheekboneR_y,cheekL_y,cheekR_y,mouthL_y, mouthR_y,noseL_y,noseR_y,outer_eyeL_y,
+            inner_eyeL_y,outer_eyeR_y,inner_eyeR_y FROM face WHERE patient=?''', (name,))
     x = c.fetchone()
     if x is None:
         return None
@@ -118,7 +126,7 @@ def getFace(name):
     f.middle = Point(x[1], x[16])
     f.upper = Point(x[2], x[17])
     f.chin = Point(x[3], x[18])
-    f.cheekboneL = Point(x[4], x[9])
+    f.cheekboneL = Point(x[4], x[19])
     f.cheekboneR = Point(x[5], x[20])
     f.cheekL = Point(x[6], x[21])
     f.cheekR = Point(x[7], x[22])
@@ -126,9 +134,9 @@ def getFace(name):
     f.mouthR = Point(x[9], x[24])
     f.noseL = Point(x[10], x[25])
     f.noseR = Point(x[11], x[26])
-    f.outer_eyeL_x = Point(x[12], x[27])
-    f.inner_eyeL_x = Point(x[13], x[28])
-    f.outer_eyeR_x = Point(x[14], x[29])
+    f.outer_eyeL = Point(x[12], x[27])
+    f.inner_eyeL = Point(x[13], x[28])
+    f.outer_eyeR = Point(x[14], x[29])
     f.inner_eyeR = Point(x[15], x[30])
     return f
 
@@ -241,7 +249,7 @@ def openPatient(name):
     f = getFace(name)
     m = getMeasurements(name)
     a = getAngles(name)
-    p = Patient(pe[0], pe[1], f, m, a)
+    p = Patient(pe[0], pe[1], pe[2], pe[3], f, m, a)
     return p
 
 def savePatient(patient):
@@ -264,13 +272,24 @@ def getPatientEntity(name):
     c.execute('SELECT * FROM patients WHERE name=?', (name,))
     return c.fetchone()
 
+def getAllPatients():
+    patients = []
+    for name in getAllPatientsNames():
+        print("exporting %s" % name)
+        patients.append(openPatient(name))
+    return patients
+
+def getAllPatientsNames():
+    c = conn.cursor()
+    c.execute('SELECT name FROM patients')
+    return [x[0] for x in c.fetchall()]
+
 def test():
     p = getExample()
     savePatient(p)
     o = openPatient(p.name)
     print(p)
     print(o)
+    print(len(str(p)))
+    print(len(str(o)))
     conn.close()
-
-initdb()    
-test()

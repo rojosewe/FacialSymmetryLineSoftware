@@ -1,5 +1,6 @@
 from geometry import distance
 import geometry
+from utils import colors as cs
 
 class Face():
     
@@ -103,6 +104,33 @@ class Measurements():
         self.mandibleL = geometry.distance(f.cheekL, mandible_middle)
         self.mandibleR = geometry.distance(f.cheekR, mandible_middle)
         
+    def getLines(self, f, color=cs.BLACK, width=2):
+        vertical_line = geometry.Line(f.upper, f.chin)
+        eye_line = geometry.Line(f.outer_eyeL, f.outer_eyeR)
+        cheek_line = geometry.Line(f.cheekboneL, f.cheekboneR)
+        nose_line = geometry.Line(f.noseL, f.noseR)
+        mouth_line = geometry.Line(f.mouthL, f.mouthR)
+        mandible_line = geometry.Line(f.cheekL, f.cheekR)
+        eye_middle = geometry.intersects(eye_line, vertical_line)
+        cheek_middle = geometry.intersects(cheek_line, vertical_line)
+        nose_middle = geometry.intersects(nose_line, vertical_line)
+        mouth_middle = geometry.intersects(mouth_line, vertical_line)
+        mandible_middle = geometry.intersects(mandible_line, vertical_line)
+        lines = []
+        lines.append(geometry.Line(f.inner_eyeL, eye_middle, w=width, color=color))
+        lines.append(geometry.Line(f.inner_eyeR, eye_middle, w=width, color=color))
+        lines.append(geometry.Line(f.outer_eyeL, eye_middle, w=width, color=color))
+        lines.append(geometry.Line(f.outer_eyeR, eye_middle, w=width, color=color))
+        lines.append(geometry.Line(f.cheekboneL, cheek_middle, w=width, color=color))
+        lines.append(geometry.Line(f.cheekboneR, cheek_middle, w=width, color=color))
+        lines.append(geometry.Line(f.noseL, nose_middle, w=width, color=color))
+        lines.append(geometry.Line(f.noseR, nose_middle, w=width, color=color))
+        lines.append(geometry.Line(f.mouthL, mouth_middle, w=width, color=color))
+        lines.append(geometry.Line(f.mouthR, mouth_middle, w=width, color=color))
+        lines.append(geometry.Line(f.cheekL, mandible_middle, w=width, color=color))
+        lines.append(geometry.Line(f.cheekR, mandible_middle, w=width, color=color))
+        return lines
+        
     def toDict(self):
         return {
             "internalCantL" : self.internalCantL,
@@ -202,19 +230,75 @@ class Angles():
             "pogonionMandibularIzq" : self.angle13,
             "pogonionTragoIzq" : self.angle14,
             "pogonionLabialIzq" : self.angle15,
-            "pogonionLabialIzq" : self.angle16,
-            "pogonionTragoIzq" : self.angle17,
-            "pogonionMandibularIzq" : self.angle18
+            "pogonionLabialDer" : self.angle16,
+            "pogonionTragoDer" : self.angle17,
+            "pogonionMandibularDer" : self.angle18
         }
+        
+    def getLines(self, f, color=cs.BLACK, width=2):
+        lines = []
+        vertical_line = geometry.Line(f.middle, f.chin, color=color, w=width)
+        lines.append(vertical_line)
+        line = geometry.Line(f.middle, f.outer_eyeL, color=color, w=width)
+        lines.append(line)
+        line = geometry.Line(f.middle, f.cheekboneL, color=color, w=width)
+        lines.append(line)
+        line = geometry.Line(f.middle, f.inner_eyeL, color=color, w=width)
+        lines.append(line)
+        line = geometry.Line(f.middle, f.cheekL, color=color, w=width)
+        lines.append(line)
+        line = geometry.Line(f.middle, f.noseL, color=color, w=width)
+        lines.append(line)
+        line = geometry.Line(f.middle, f.mouthL, color=color, w=width)
+        lines.append(line)
+        line = geometry.Line(f.middle, f.mouthR, color=color, w=width)
+        lines.append(line)
+        line = geometry.Line(f.middle, f.noseR, color=color, w=width)
+        lines.append(line)
+        line = geometry.Line(f.middle, f.cheekR, color=color, w=width)
+        lines.append(line)
+        line = geometry.Line(f.middle, f.inner_eyeL, color=color, w=width)
+        lines.append(line)
+        line = geometry.Line(f.middle, f.cheekboneR, color=color, w=width)
+        lines.append(line)
+        line = geometry.Line(f.middle, f.outer_eyeR, color=color, w=width)
+        lines.append(line)
+        line = geometry.Line(f.chin, f.cheekL, color=color, w=width)
+        lines.append(line)
+        line = geometry.Line(f.chin, f.cheekboneL, color=color, w=width)
+        lines.append(line)
+        line = geometry.Line(f.chin, f.mouthL, color=color, w=width)
+        lines.append(line)
+        line = geometry.Line(f.chin, f.mouthR, color=color, w=width)
+        lines.append(line)
+        line = geometry.Line(f.chin, f.cheekR, color=color, w=width)
+        lines.append(line)
+        line = geometry.Line(f.chin, f.cheekboneR, color=color, w=width)
+        lines.append(line)
+        return lines
         
     def __str__(self):
         return str(self.toDict())
     
 class Patient():
     
-    def __init__(self, name, photo, face=Face(), measurements=None, angles=None):
+    def __init__(self, name, age, gender, photo, face=Face(), measurements=None, angles=None):
         self.name = name
+        self.age = age
+        self.gender = gender
         self.photo = photo
         self.face = face
         self.measurements = measurements
         self.angles = angles
+        
+    def __str__(self):
+        return """
+        {'name': %s,
+        'age': %s,
+        'gender': %s,
+        'face': %s,
+        'photo': %s,
+        'measurements': %s,
+        'angles': %s
+        }
+        """ % (self.name, self.age, self.gender, self.photo, str(self.face), str(self.measurements), str(self.angles))

@@ -15,7 +15,7 @@ import facial_measures
 
 max_v = 700
 
-complete = 0
+complete = False
 img = None
 size = None
 screen = None
@@ -24,10 +24,16 @@ guideline = []
 vertical = []
 marks = []
 patient = None
+showMeasures = True
+showAngles = True
+measures = []
+angles = []
 
 def init(pygame, patient_value):
-    global  img, size, patient
+    global  img, size, patient, showMeasures, showAngles
     patient = patient_value
+    showMeasures = True
+    showAngles = True
     img = pygame.image.load(patient.photo)
     size = img.get_rect().size
     w = size[0]
@@ -36,6 +42,7 @@ def init(pygame, patient_value):
     h = min(max_v, h)
     w = int(h * proportion)
     img = pygame.transform.scale(img, (w, h))
+    return (w, h)
     
 def load(screen_main, left, top, right, bottom):
     global screen, rect
@@ -44,11 +51,12 @@ def load(screen_main, left, top, right, bottom):
     print(Order.order[0])
     
 def deleteLastMark():
+    global complete
     if len(marks) == 1:
         vertical.clear()
     elif len(marks) == 0:
         guideline.clear()
-    
+    complete = False
     if len(marks) > 0:
         del marks[-1]
 
@@ -71,6 +79,14 @@ def draw(p, pos):
             
         for x in marks:
             d.circle(screen, x.color, x.get(), x.r)
+        if complete:
+            if showMeasures:
+                for m in measures:
+                    d.line(screen, m.color, m.p1.get(), m.p2.get(), m.w)
+                    
+            if showAngles:
+                for a in angles:
+                    d.line(screen, a.color, a.p1.get(), a.p2.get(), a.w)
     
 def getFacepos(p, pos):
     global complete, vertical, guideline
@@ -119,39 +135,52 @@ def getFacepos(p, pos):
             return Commands.NEXT
         else:
             return Commands.OUT_OF_BOUNDS
-    if complete == 0:
-        complete = 1
+    if not complete:
+        complete = True
         return Commands.MEASUREMENTS_DONE
-    elif complete == 1:
+    else:
         return Commands.MEASUREMENTS_DONE_REP
+    
+def addMeasures(patient):
+    global measures
+    measures = patient.measurements.getLines(patient.face, color = cs.GREEN, width = 2)
+
+def addAngles(patient):
+    global angles
+    angles = patient.angles.getLines(patient.face, color = cs.RED, width = 2)
     
 def processClick(event, point, pos):
     print("Processing")
     return getFacepos(point, pos)
 
 def processKey(pg, event):
+    global showAngles, showMeasures
     if event.key == pg.K_d:
         return Commands.DELETE_MARK
     elif event.key == pg.K_c:
         return Commands.CLEAR_MARKS
-    elif event.key == pg.K_KP_ENTER:
-        if complete == 1:
-            print("1")
-            processFullPatient()
-            return Commands.MEASUREMENTS_DONE
-        else:
-            print("0")
+    elif event.key == pg.K_a:
+        showAngles = not showAngles
+    elif event.key == pg.K_m:
+        showMeasures = not showMeasures
+    elif event.key == pg.K_p:
+        return Commands.SHOW_PROPORTIONS
             
 def processFullPatient(patient):
     patient.measurements = facial_measures.Measurements()
     patient.angles = facial_measures.Angles()
     patient.measurements.calculate(patient.face)
-    patient.angles.calulate(patient.face)
+    patient.angles.calculate(patient.face)
+    addMeasures(patient)
+    addAngles(patient)
     return patient
     
 def clean():
+    global complete
     guideline.clear()
     vertical.clear()
     marks.clear()
     patient.face = Face()
-    
+    measures.clear()
+    angles.clear()
+    complete = False

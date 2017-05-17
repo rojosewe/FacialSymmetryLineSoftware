@@ -3,6 +3,7 @@ from pygame import mouse as m
 from geometry import Point
 from workAreas import Reference, Workspace
 from utils import Commands, Loader
+import easygui as gui
 
 def getPoint():
     p = m.get_pos()
@@ -10,20 +11,32 @@ def getPoint():
 
 pos = 0
 
-def load(pygame, patient):
-    global pos
-    Reference.init(pygame)
-    Workspace.init(pygame, patient)
+def humanLengthProps(prop):
+    if prop > 1.0:
+        d = (prop - 1) * 100
+        return "{0:.2f}% mas largo hacia la izquierda.".format(d)
+    elif prop < 1.0:
+        d = (1 - prop) * 100
+        return "{0:.2f}% mas largo hacia la derecha.".format(d)
+    else:
+        return "Ambos lados son de distancia identica"
     
+
+def load(pygame, patient, complete=False):
+    global pos
+    rw, rh = Reference.init(pygame)
+    ww, wh = Workspace.init(pygame, patient)
+    if complete:
+        pos = 2000
     left = 0
     top = 0
-    right = Reference.size[0] + Workspace.size[0]
-    bottom = max(Reference.size[1], Workspace.size[1])
+    right = rw + ww
+    bottom = max(rh, wh)
     print(right)
     screen = pygame.display.set_mode((right, bottom))
     
-    Reference.load(screen, left, top, Reference.size[0], Reference.size[1])
-    Workspace.load(screen, Reference.size[0], 0, right, Workspace.size[1])
+    Reference.load(screen, left, top, rw, rh)
+    Workspace.load(screen, rw, 0, right, wh)
     
     while True:
         P = getPoint()
@@ -53,6 +66,29 @@ def load(pygame, patient):
                 elif command == Commands.CLEAR_MARKS:
                     pos = 0
                     Workspace.clean()
+                elif command == Commands.SHOW_PROPORTIONS:
+                    if Workspace.complete:
+                        internalCant = patient.measurements.internalCantL / patient.measurements.internalCantR
+                        externalCant = patient.measurements.externalCantL / patient.measurements.externalCantR
+                        trago = patient.measurements.tragoL / patient.measurements.tragoR
+                        rebordeAlar = patient.measurements.rebordeAlarL / patient.measurements.rebordeAlarR
+                        lip = patient.measurements.lipL / patient.measurements.lipR
+                        mandible = patient.measurements.mandibleL / patient.measurements.mandibleR
+                        
+                        
+                        msg = """
+Proporciones:
+    - Canto interno :   %s
+    - Canto externo :   %s
+    - Trago :           %s
+    - Reborder alar :   %s
+    - Comisura bucal :  %s
+    - Ang. mandibular : %s
+    - 
+""" % (humanLengthProps(internalCant), humanLengthProps(externalCant),
+       humanLengthProps(trago), humanLengthProps(rebordeAlar), 
+       humanLengthProps(lip), humanLengthProps(mandible))
+                        gui.msgbox(msg, "measurements")                    
                 elif command == None:
                     if event.key == pygame.K_q:
                         return Commands.EXIT
