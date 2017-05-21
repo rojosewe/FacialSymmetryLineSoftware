@@ -193,7 +193,7 @@ class Angles():
         self.angle8 = geometry.angle(vertical_line, line)
         line = geometry.Line(f.middle, f.cheekR)
         self.angle9 = geometry.angle(vertical_line, line)
-        line = geometry.Line(f.middle, f.inner_eyeL)
+        line = geometry.Line(f.middle, f.inner_eyeR)
         self.angle10 = geometry.angle(vertical_line, line)
         line = geometry.Line(f.middle, f.cheekboneR)
         self.angle11 = geometry.angle(vertical_line, line)
@@ -208,9 +208,9 @@ class Angles():
         self.angle15 = geometry.angle(vertical_line, line)
         line = geometry.Line(f.chin, f.mouthR)
         self.angle16 = geometry.angle(vertical_line, line)
-        line = geometry.Line(f.chin, f.cheekR)
-        self.angle17 = geometry.angle(vertical_line, line)
         line = geometry.Line(f.chin, f.cheekboneR)
+        self.angle17 = geometry.angle(vertical_line, line)
+        line = geometry.Line(f.chin, f.cheekR)
         self.angle18 = geometry.angle(vertical_line, line)
         
     def toDict(self):
@@ -257,7 +257,7 @@ class Angles():
         lines.append(line)
         line = geometry.Line(f.middle, f.cheekR, color=color, w=width)
         lines.append(line)
-        line = geometry.Line(f.middle, f.inner_eyeL, color=color, w=width)
+        line = geometry.Line(f.middle, f.inner_eyeR, color=color, w=width)
         lines.append(line)
         line = geometry.Line(f.middle, f.cheekboneR, color=color, w=width)
         lines.append(line)
@@ -280,6 +280,42 @@ class Angles():
     def __str__(self):
         return str(self.toDict())
     
+class Proportions():
+    
+    def __init__(self):
+        self.internalCantLength = None
+        self.externalCantLength = None
+        self.tragoLength = None
+        self.rebordeAlarLength = None
+        self.lipLength = None
+        self.mandibleLength = None
+        self.glabelarCantoExtAngle = None 
+        self.glablearTragoAngle = None
+        self.glabelarCantoIntAngle = None
+        self.glablearMadibularAngle = None
+        self.glablearNasalAngle = None
+        self.glablearLabialAngle = None
+        self.pogonionMandibularAngle = None
+        self.pogonionTragoAngle = None
+        self.pogonionLabialAngle = None
+        
+    def calculate(self, measurements, angles):    
+        self.internalCantLength = measurements.internalCantL / measurements.internalCantR
+        self.externalCantLength = measurements.externalCantL / measurements.externalCantR
+        self.tragoLength = measurements.tragoL / measurements.tragoR
+        self.rebordeAlarLength = measurements.rebordeAlarL / measurements.rebordeAlarR
+        self.lipLength = measurements.lipL / measurements.lipR
+        self.mandibleLength = measurements.mandibleL / measurements.mandibleR
+        self.glabelarCantoExtAngle = angles.angle1 / angles.angle12 
+        self.glablearTragoAngle = angles.angle2 / angles.angle11
+        self.glabelarCantoIntAngle = angles.angle3 / angles.angle10
+        self.glablearMadibularAngle = angles.angle4 / angles.angle9
+        self.glablearNasalAngle = angles.angle5 / angles.angle8
+        self.glablearLabialAngle = angles.angle6 / angles.angle7
+        self.pogonionMandibularAngle = angles.angle13 / angles.angle18
+        self.pogonionTragoAngle = angles.angle14 / angles.angle17
+        self.pogonionLabialAngle = angles.angle15 / angles.angle16
+    
 class Patient():
     
     def __init__(self, name, age, gender, photo, face=Face(), measurements=None, angles=None):
@@ -290,6 +326,7 @@ class Patient():
         self.face = face
         self.measurements = measurements
         self.angles = angles
+        self.proportions = Proportions()
         
     def __str__(self):
         return """

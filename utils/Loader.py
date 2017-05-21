@@ -6,30 +6,6 @@ import sqlite3
 #    m = {'internalCantL': 41.14422963927595, 'internalCantR': 140.89986572353908, 'externalCantL': 150.13207547169816, 'externalCantR': 44.86792452830184, 'tragoL': 207.32171206597877, 'tragoR': 193.75808049405538, 'rebordeAlarL': 60.16148932741971, 'rebordeAlarR': 47.88016930479493, 'lipL': 85.77358490566041, 'lipR': 71.22641509433959, 'mandibleL': 152.91080331443047, 'mandibleR': 132.09621414303498}
 #    a = {'glabelarCantoExtIzq': 77.85944654988626, 'glablearTragoIzq': 65.09982186205457, 'glabelarCantoIntIzq': 51.32562773794214, 'glablearMadibularIzq': 28.272696362029926, 'glablearNasalIzq': 23.070668171818912, 'glablearLabialIzq': 20.774545963317635, 'glablearLabialDer': 17.215015614298263, 'glablearNasalDer': 18.660355201770717, 'glablearMadibularDer': 24.36974925634328, 'glabelarCantoIntDer': 51.32562773794214, 'glablearTragoDer': 63.74883306141948, 'glabelarCantoExtDer': 51.13154749261923, 'pogonionMandibularIzq': 37.646200974108844, 'pogonionTragoIzq': 67.478912173346, 'pogonionLabialIzq': 31.31024910388655}
 
-def getExample():
-    f = Face()
-    f.middle = Point(668, 297)
-    f.upper = Point(664, 113) 
-    f.chin = Point(674, 643)
-    f.outer_eyeL = Point(518, 332) 
-    f.inner_eyeL = Point(627, 331) 
-    f.outer_eyeR = Point(713, 332) 
-    f.inner_eyeR = Point(809, 329) 
-    f.cheekboneL = Point(462, 397) 
-    f.cheekboneR = Point(863, 389) 
-    f.noseL = Point(610, 440) 
-    f.noseR = Point(718, 437) 
-    f.cheekL = Point(520, 584) 
-    f.cheekR = Point(805, 586) 
-    f.mouthL = Point(586, 525) 
-    f.mouthR = Point(743, 525)
-    m = Measurements()
-    a = Angles()
-    m.calculate(f)
-    a.calculate(f)
-    patient = Patient("test1", 18, "Male", "images/2.JPG", f, m, a)
-    return patient
-
 conn = sqlite3.connect('files/patients.db')
 
 def initdb():
@@ -250,6 +226,7 @@ def openPatient(name):
     m = getMeasurements(name)
     a = getAngles(name)
     p = Patient(pe[0], pe[1], pe[2], pe[3], f, m, a)
+    p.proportions.calculate(m, a)
     return p
 
 def savePatient(patient):
@@ -283,13 +260,3 @@ def getAllPatientsNames():
     c = conn.cursor()
     c.execute('SELECT name FROM patients')
     return [x[0] for x in c.fetchall()]
-
-def test():
-    p = getExample()
-    savePatient(p)
-    o = openPatient(p.name)
-    print(p)
-    print(o)
-    print(len(str(p)))
-    print(len(str(o)))
-    conn.close()

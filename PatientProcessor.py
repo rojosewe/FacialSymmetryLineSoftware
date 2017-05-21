@@ -21,8 +21,18 @@ def humanLengthProps(prop):
     else:
         return "Ambos lados son de distancia identica"
     
+def humanAngleProps(prop):
+    if prop > 1.0:
+        d = (prop - 1) * 100
+        return "{0:.2f}% mas amplio hacia la izquierda.".format(d)
+    elif prop < 1.0:
+        d = (1 - prop) * 100
+        return "{0:.2f}% mas amplio hacia la derecha.".format(d)
+    else:
+        return "Ambos lados son de angulo identico"
+    
 
-def load(pygame, patient, complete=False):
+def load(pygame, patient, complete=False, loaded=False):
     global pos
     rw, rh = Reference.init(pygame)
     ww, wh = Workspace.init(pygame, patient)
@@ -34,7 +44,6 @@ def load(pygame, patient, complete=False):
     bottom = max(rh, wh)
     print(right)
     screen = pygame.display.set_mode((right, bottom))
-    
     Reference.load(screen, left, top, rw, rh)
     Workspace.load(screen, rw, 0, right, wh)
     
@@ -66,32 +75,48 @@ def load(pygame, patient, complete=False):
                 elif command == Commands.CLEAR_MARKS:
                     pos = 0
                     Workspace.clean()
+                elif command == Commands.START:
+                    if Workspace.complete:
+                        return Commands.START
+                    else:
+                        if gui.boolbox("Exiting", "You are exiting. All progress in this patient will be lost.", ["OK", "Cancel"]):
+                            pygame.quit()
+                            return Commands.START
+                        else:
+                            continue
                 elif command == Commands.SHOW_PROPORTIONS:
                     if Workspace.complete:
-                        internalCant = patient.measurements.internalCantL / patient.measurements.internalCantR
-                        externalCant = patient.measurements.externalCantL / patient.measurements.externalCantR
-                        trago = patient.measurements.tragoL / patient.measurements.tragoR
-                        rebordeAlar = patient.measurements.rebordeAlarL / patient.measurements.rebordeAlarR
-                        lip = patient.measurements.lipL / patient.measurements.lipR
-                        mandible = patient.measurements.mandibleL / patient.measurements.mandibleR
-                        
+                        prop = patient.proportions
                         
                         msg = """
-Proporciones:
+Proporciones Medida:
     - Canto interno :   %s
     - Canto externo :   %s
     - Trago :           %s
     - Reborder alar :   %s
     - Comisura bucal :  %s
     - Ang. mandibular : %s
-    - 
-""" % (humanLengthProps(internalCant), humanLengthProps(externalCant),
-       humanLengthProps(trago), humanLengthProps(rebordeAlar), 
-       humanLengthProps(lip), humanLengthProps(mandible))
+Proporciones Angulares:
+    - Glabelar - Canto interno :   %s
+    - Glabelar - Canto externo :   %s
+    - Glabelar - Trago :           %s
+    - Glabelar - Reborder alar :   %s
+    - Glabelar - Comisura bucal :  %s
+    - Glabelar - Ang. mandibular : %s
+    - Pogonion - Trago :           %s
+    - Pogonion - Comisura bucal :  %s
+    - Pogonion - Ang. mandibular : %s
+""" % (humanLengthProps(prop.internalCantLength), humanLengthProps(prop.externalCantLength),
+       humanLengthProps(prop.tragoLength), humanLengthProps(prop.rebordeAlarLength), 
+       humanLengthProps(prop.lipLength), humanLengthProps(prop.mandibleLength),
+       humanAngleProps(prop.glabelarCantoIntAngle), humanAngleProps(prop.glabelarCantoExtAngle),
+       humanAngleProps(prop.glablearTragoAngle), humanAngleProps(prop.glablearNasalAngle), 
+       humanLengthProps(prop.glablearLabialAngle), humanLengthProps(prop.glablearMadibularAngle),
+       humanAngleProps(prop.pogonionTragoAngle), humanLengthProps(prop.pogonionLabialAngle), 
+       humanLengthProps(prop.pogonionMandibularAngle))
                         gui.msgbox(msg, "measurements")                    
                 elif command == None:
                     if event.key == pygame.K_q:
                         return Commands.EXIT
                     
         pygame.display.flip()        
-    

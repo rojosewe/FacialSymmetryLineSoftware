@@ -165,12 +165,15 @@ def processKey(pg, event):
         showMeasures = not showMeasures
     elif event.key == pg.K_p:
         return Commands.SHOW_PROPORTIONS
+    elif event.key == pg.K_n:
+        return Commands.START
             
 def processFullPatient(patient):
     patient.measurements = facial_measures.Measurements()
     patient.angles = facial_measures.Angles()
     patient.measurements.calculate(patient.face)
     patient.angles.calculate(patient.face)
+    patient.proportions.calculate(patient.measurements, patient.angles)
     addMeasures(patient)
     addAngles(patient)
     return patient

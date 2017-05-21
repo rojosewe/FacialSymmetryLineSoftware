@@ -3,16 +3,14 @@ from email.policy import default
 import os
 from os.path import expanduser
 import sys 
-
+import pygame
 import PatientProcessor
 import easygui as gui
 from facial_measures import Face
 from facial_measures import Patient
 from utils import Commands, Loader, CSV
 
-
 home = expanduser("~")
-pygame = None
 patient_name = None
 
 def makeInitialSelection():
@@ -56,7 +54,8 @@ def savePatient(patient):
         
 def exportDB():
     location = gui.filesavebox(msg="Choose location to save", title="Save file", default='db.csv', filetypes=["*.csv"])
-    print(location)
+    if location is None:
+        return Commands.START
     if not location.endswith(".csv"):
         location += ".csv"
     patients = Loader.getAllPatients()
@@ -78,17 +77,16 @@ def executeGUICommand(command):
         sys.exit()
     return command
 
-def start(home_path, pygame_x):
-    global home, pygame
+def start(home_path):
+    global home
     home = home_path
-    pygame = pygame_x
     command = Commands.START
     while 1:
         command = executeGUICommand(command)
 
 def openPatient(name):
     patient = Loader.openPatient(name)
-    PatientProcessor.load(pygame, patient, complete=True)
+    return PatientProcessor.load(pygame, patient, complete=True, loaded=True)
 
 def fillPatientInfo():
     global patient_name
@@ -96,8 +94,13 @@ def fillPatientInfo():
     if patient_name is not None:
         default = patient_name
     name = gui.enterbox("Enter the patient information", "Patient information", default)
+    if name is None:
+        return Commands.START
     patient_name = name
-    patient_age = int(gui.enterbox("Enter the patient age", "Patient age", 18))
+    patient_age = gui.enterbox("Enter the patient age", "Patient age", 18)
+    if patient_age is None:
+        return Commands.START
+    patient_age = int(patient_age)
     patient_gender = "Male" if gui.indexbox("Gender.", choices=("Male", "Female")) == 0 else "Female"
     if name is None:
         return Commands.START
@@ -105,4 +108,4 @@ def fillPatientInfo():
     if image is None:
         return Commands.CREATE
     patient = Patient(name, patient_age, patient_gender, image, Face())
-    PatientProcessor.load(pygame, patient)
+    return PatientProcessor.load(pygame, patient)
