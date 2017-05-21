@@ -4,6 +4,8 @@ Created on May 14, 2017
 @author: root
 '''
 
+import os
+
 columns = ["Nombre", "Edad", "Genero", "canto_interno_izq", "canto_externo_izq", "trago_izq", "reborde_alar_izq",
            "comisura_labial_izq", "angulo_mandibular_izq", 
            "canto_interno_der", "canto_externo_der", "trago_der", "reborde_alar_der",
@@ -25,7 +27,7 @@ def patientsToCSV(patients, file):
     with open(file, mode='w+') as f:
         f.write(",".join(columns) + "\n")
         for p in patients:
-            str = "'%s',%s,'%s',%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n" % (
+            str = "'%s',%s,'%s',%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s%s" % (
 p.name, p.age, p.gender, p.measurements.internalCantL, p.measurements.externalCantL, p.measurements.tragoL, p.measurements.rebordeAlarL, 
 p.measurements.lipL, p.measurements.mandibleL, p.measurements.internalCantR, p.measurements.externalCantR, 
 p.measurements.tragoR, p.measurements.rebordeAlarR, p.measurements.lipR, p.measurements.mandibleR, 
@@ -36,6 +38,6 @@ p.proportions.internalCantLength, p.proportions.externalCantLength, p.proportion
 p.proportions.lipLength, p.proportions.mandibleLength, 
 p.proportions.glabelarCantoExtAngle, p.proportions.glablearTragoAngle,
 p.proportions.glabelarCantoIntAngle, p.proportions.glablearMadibularAngle, p.proportions.glablearNasalAngle, 
-p.proportions.pogonionMandibularAngle, p.proportions.pogonionTragoAngle, p.proportions.pogonionLabialAngle
-)
+p.proportions.pogonionMandibularAngle, p.proportions.pogonionTragoAngle, p.proportions.pogonionLabialAngle, 
+os.linesep)
             f.write(str)
