@@ -8,12 +8,15 @@ import os
 from geometry import Rect
 from facial_measures import Order
 from utils import colors as cs
-from pygame import draw as d
+from PIL import Image
+from PIL.ImageTk import PhotoImage
+
 
 img = None
-size = None
 screen = None
 rect = None
+point = None
+img_obj = None
 
 points = {Order.TOP_HEAD: (100, 56), Order.CHIN: (100, 228), 
 Order.FOREHEAD: (100, 105), Order.EYE_OUTER_LEFT: (55, 123), 
@@ -24,25 +27,30 @@ Order.NOSE_RIGHT: (123, 152), Order.MOUTH_LEFT: (78, 181),
 Order.MOUTH_RIGHT: (125, 181), Order.CHEEK_LEFT: (48, 209), 
 Order.CHEEK_RIGHT: (155, 207)}
 
-def init(pygame):
-    global  img, size
-    img = pygame.image.load(os.path.join("images", "reference.jpeg"))
-    size = img.get_rect().size
-    return (size[0], size[1])
+def init():
+    global  img
+    img = os.path.join("images", "reference.jpeg")
+    pil_img = Image.open(img)
+    return pil_img.size
     
 def load(screen_main, left, top, right, bottom):
-    global screen, rect
+    global screen, rect, img_obj
     screen = screen_main
     rect = Rect(left, top, right, bottom)
+    img_obj = PhotoImage(file=img)
+    screen.create_image(rect.left, rect.top, image=img_obj, anchor="nw")
 
-def processClick(event, p, pos):
-    print(p)
+def processClick(p, pos):
+    draw(pos)
 
-def draw(p, pos):
-    screen.blit(img, (rect.left, rect.top))
+def draw(pos):
+    global point
+    if point is not None:
+        screen.delete(point)
     if pos < len(Order.order):
         x = Order.order[pos]
         if x in points:
             refPoint = points[x]
             refPoint = (refPoint[0], refPoint[1])
-            d.circle(screen, cs.RED, refPoint, 4)
+            point = screen.create_oval(refPoint[0], refPoint[1], 
+                         refPoint[0] +4, refPoint[0] + 4, fill=cs.RED)

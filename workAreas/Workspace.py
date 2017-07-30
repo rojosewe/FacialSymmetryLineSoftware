@@ -9,46 +9,45 @@ from facial_measures import Face, Order
 from geometry import Point, Line, Mark
 from utils import colors as cs
 from utils import Commands
-from pygame import draw as d
 import facial_measures
+from PIL import Image
+from PIL.ImageTk import PhotoImage
+from workAreas.Reference import img_obj
 
 
 max_v = 700
 
 complete = False
-img = None
-size = None
 screen = None
 rect = None
-guideline = []
-vertical = []
-marks = []
 patient = None
 showMeasures = True
 showAngles = True
-measures = []
-angles = []
+guidelines = []
+marks = []
+img_obj = None
 
-def init(pygame, patient_value):
-    global  img, size, patient, showMeasures, showAngles
+
+def init(patient_value):
+    global  patient, showMeasures, showAngles
     patient = patient_value
     showMeasures = True
     showAngles = True
-    img = pygame.image.load(patient.photo)
-    size = img.get_rect().size
-    w = size[0]
-    h = size[1]
+    pil_img = Image.open(patient.photo)
+    w, h = pil_img.size
     proportion = w/h
     h = min(max_v, h)
     w = int(h * proportion)
-    img = pygame.transform.scale(img, (w, h))
     return (w, h)
     
 def load(screen_main, left, top, right, bottom):
-    global screen, rect
+    global screen, rect, img_obj
     screen = screen_main
     rect = Rect(left, top, right, bottom)
-    print(Order.order[0])
+    img_obj = Image.open(patient.photo)
+    img_obj.resize((120, 120), Image.ANTIALIAS)
+    img_obj = PhotoImage(img_obj, size=(120, 120))
+    screen.create_image(rect.left, rect.top, image=img_obj, anchor="nw")
     
 def deleteLastMark():
     global complete
@@ -60,33 +59,40 @@ def deleteLastMark():
     if len(marks) > 0:
         del marks[-1]
 
-def draw(p, pos):
-    screen.blit(img, (rect.left, rect.top))
-    if p.x >= rect.left and p.x < rect.right and p.y >= rect.top and p.y < rect.bottom:
-        if pos < 3: 
-            d.line(screen, cs.LIGHT, (p.x, rect.top), (p.x, rect.bottom), 1)
-        else:
-            d.circle(screen, cs.BLACK, p.get(), 2)
-            d.line(screen, cs.LIGHT, (rect.left, p.y), (rect.right, p.y), 1)
-        
-        if len(guideline) > 0:
-            l = guideline[0]
-            d.line(screen, l.color, l.p1.get(), l.p2.get(), l.w)
-            
-        if len(vertical) > 0:
-            l = vertical[0]
-            d.line(screen, l.color, l.p1.get(), l.p2.get(), l.w)
-            
-        for x in marks:
-            d.circle(screen, x.color, x.get(), x.r)
-        if complete:
-            if showMeasures:
-                for m in measures:
-                    d.line(screen, m.color, m.p1.get(), m.p2.get(), m.w)
+# def draw(p, pos):
+#     if p.x >= rect.left and p.x < rect.right and p.y >= rect.top and p.y < rect.bottom:
+#         if pos < 3: 
+#             d.line(screen, cs.LIGHT, (p.x, rect.top), (p.x, rect.bottom), 1)
+#         else:
+#             d.circle(screen, cs.BLACK, p.get(), 2)
+#             d.line(screen, cs.LIGHT, (rect.left, p.y), (rect.right, p.y), 1)
+#         
+#         if len(guideline) > 0:
+#             l = guideline[0]
+#             d.line(screen, l.color, l.p1.get(), l.p2.get(), l.w)
+#             
+#         if len(vertical) > 0:
+#             l = vertical[0]
+#             d.line(screen, l.color, l.p1.get(), l.p2.get(), l.w)
+#             
+#         for x in marks:
+#             d.circle(screen, x.color, x.get(), x.r)
+#         if complete:
+#             if showMeasures:
+#                 for m in measures:
+#                     d.line(screen, m.color, m.p1.get(), m.p2.get(), m.w)
+#                     
+#             if showAngles:
+#                 for a in angles:
+#                     d.line(screen, a.color, a.p1.get(), a.p2.get(), a.w)
                     
-            if showAngles:
-                for a in angles:
-                    d.line(screen, a.color, a.p1.get(), a.p2.get(), a.w)
+def create_line(line):
+    return screen.create_line(line.p1.x, line.p1.y, 
+                              line.p2.x, line.p2.y, fill=line.color, width=line.w)
+    
+def create_mark(mark):
+    return screen.create_oval(mark.p.x, mark.p.y, mark.p.x + mark.r, 
+                              mark.p.y + mark.r, fill=mark.color)
     
 def getFacepos(p, pos):
     global complete, vertical, guideline
@@ -94,13 +100,14 @@ def getFacepos(p, pos):
         if p.x >= rect.left and p.x < rect.right and p.y >= rect.top and p.y < rect.bottom:  
             x = Order.order[pos]
             if x == Order.HORIZONTAL_LINE:
-                # set center
-                guideline.append(Line(Point(p.x, rect.top), Point(p.x, rect.bottom), color = cs.RED))
+                guidelines.append(create_line(Line(Point(p.x, rect.top), 
+                                                Point(p.x, rect.bottom), color = cs.RED)))
             elif x == Order.TOP_HEAD:
                 patient.face.upper = p
             elif x == Order.CHIN:
                 patient.face.chin = p
-                vertical.append(Line(patient.face.upper, patient.face.chin, color=cs.LIGHT, w=1))
+                line = Line(patient.face.upper, patient.face.chin, color=cs.LIGHT, w=1)
+                guidelines.append(line)
             elif x == Order.FOREHEAD:
                 patient.face.middle = p
             elif x == Order.EYE_OUTER_LEFT:
@@ -129,7 +136,7 @@ def getFacepos(p, pos):
                 patient.face.cheekR = p
             
             if pos > 0:
-                marks.append(Mark(p, r = 4, color = cs.GREEN))
+                marks.append(create_mark(Mark(p, r = 4, color = cs.GREEN)))
             print(Order.order[pos])
             pos += 1
             return Commands.NEXT
@@ -147,25 +154,24 @@ def addMeasures(patient):
 
 def addAngles(patient):
     global angles
-    angles = patient.angles.getLines(patient.face, color = cs.RED, width = 2)
+    angles = patient.angles.getLines(patient.face, color = cs.BLUE, width = 2)
     
 def processClick(event, point, pos):
-    print("Processing")
     return getFacepos(point, pos)
 
 def processKey(pg, event):
     global showAngles, showMeasures
-    if event.key == pg.K_d:
+    if event.char == "d":
         return Commands.DELETE_MARK
-    elif event.key == pg.K_c:
+    elif event.char == "c":
         return Commands.CLEAR_MARKS
-    elif event.key == pg.K_a:
+    elif event.char == "a":
         showAngles = not showAngles
-    elif event.key == pg.K_m:
+    elif event.char == "m":
         showMeasures = not showMeasures
-    elif event.key == pg.K_p:
+    elif event.char == "p":
         return Commands.SHOW_PROPORTIONS
-    elif event.key == pg.K_n:
+    elif event.char == "n":
         return Commands.START
             
 def processFullPatient(patient):

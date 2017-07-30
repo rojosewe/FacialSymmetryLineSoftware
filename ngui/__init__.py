@@ -3,19 +3,23 @@ from email.policy import default
 import os
 from os.path import expanduser
 import sys 
-import pygame
 import PatientProcessor
 import easygui as gui
 from facial_measures import Face
 from facial_measures import Patient
 from utils import Commands, Loader, CSV
+from utils.Messages import messages as ms
+import tkinter as tk
 
 home = expanduser("~")
 patient_name = None
 
 def makeInitialSelection():
-    action = gui.indexbox("Choose an option.", choices=("Create new patient", "Open existing one", "Export the database to csv", "Exit"), 
-                        default_choice="Create new patient", cancel_choice="Exit")
+    action = gui.indexbox(ms["choose_an_option"], choices=(ms["create_new_patient"], 
+                                                           ms["open_patient"],
+                                                           ms["export_to_csv"],
+                                                           ms["exit"]), 
+                        default_choice=ms["create_new_patient"], cancel_choice=ms["exit"])
     if action == 0:
         return Commands.CREATE
     elif action == 1:
@@ -25,13 +29,14 @@ def makeInitialSelection():
     elif action == 3:
         sys.exit()
         
+        
 def selectImage():
-    return gui.fileopenbox("Select the image", "Image selection", default="./images",
+    return gui.fileopenbox(ms["select_image"], ms["image_Selection"], default="./images",
                      filetypes=["*.jpg", "*.jpeg", "*.png", "*.gif", "*.bmp"])
 
 def selectPatient():
-    msg ="Select the patient"
-    title = "Patients"
+    msg =ms["select_patient"]
+    title = ms["patients"]
     choices = Loader.getAllPatientsNames()
     choice = gui.choicebox(msg, title, choices)
     if choice == None:
@@ -40,20 +45,18 @@ def selectPatient():
         return openPatient(choice)
 
 def savePatient(patient):
-    text = "Hola"
-    save = gui.boolbox(text, "Patient measures save?", ["Save", "Cancel"])
+    save = gui.boolbox(ms["save_measures"], ms["save_measures"], [ms["save"], ms["cancel"]])
     if save:
-        gui.msgbox("The patient has been saved", "Saved")
+        gui.msgbox(ms["patient_saved"], ms["saved"])
         return Commands.START
     else:
-        if gui.boolbox("You said not to save, this will delete the progress for this patient. Are you sure?", 
-                    "Cancel?", ["Yes", "No"]):
+        if gui.boolbox(ms["not_save_msg"], ms["cancel_q"], [ms["yes"], ms["no"]]):
             return Commands.START
         else:
             return Commands.SAVE
         
 def exportDB():
-    location = gui.filesavebox(msg="Choose location to save", title="Save file", default='db.csv', filetypes=["*.csv"])
+    location = gui.filesavebox(msg=ms["choose_save_location"], title=ms["save"], default='db.csv', filetypes=["*.csv"])
     if location is None:
         return Commands.START
     if not location.endswith(".csv"):
@@ -86,26 +89,27 @@ def start(home_path):
 
 def openPatient(name):
     patient = Loader.openPatient(name)
-    return PatientProcessor.load(pygame, patient, complete=True, loaded=True)
+    return PatientProcessor.load(patient, complete=True, loaded=True)
+
 
 def fillPatientInfo():
     global patient_name
     default = ""
     if patient_name is not None:
         default = patient_name
-    name = gui.enterbox("Enter the patient information", "Patient information", default)
+    name = gui.enterbox(ms["enter_info"], ms["patient_info"], default)
     if name is None:
         return Commands.START
     patient_name = name
-    patient_age = gui.enterbox("Enter the patient age", "Patient age", 18)
+    patient_age = gui.enterbox(ms["enter_patient_age"], ms["patient_age"], 18)
     if patient_age is None:
         return Commands.START
     patient_age = int(patient_age)
-    patient_gender = "Male" if gui.indexbox("Gender.", choices=("Male", "Female")) == 0 else "Female"
+    patient_gender = ms["male"] if gui.indexbox(ms["gender"], choices=(ms["male"], ms["female"])) == 0 else ms["female"]
     if name is None:
         return Commands.START
     image = selectImage()
     if image is None:
         return Commands.CREATE
     patient = Patient(name, patient_age, patient_gender, image, Face())
-    return PatientProcessor.load(pygame, patient)
+    return PatientProcessor.load(patient)
