@@ -52,5 +52,6 @@ def draw(pos):
         if x in points:
             refPoint = points[x]
             refPoint = (refPoint[0], refPoint[1])
-            point = screen.create_oval(refPoint[0], refPoint[1], 
-                         refPoint[0] +4, refPoint[0] + 4, fill=cs.RED)
+            point = screen.create_oval(refPoint[0], refPoint[0] +4,
+                                       refPoint[1], refPoint[0] + 4, 
+                                       fill=cs.RED)
