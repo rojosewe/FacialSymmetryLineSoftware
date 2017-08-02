@@ -1,5 +1,6 @@
 from geometry import Point
 from workAreas import Reference, Workspace
+from utils.Messages import messages as ms
 from utils import Commands, Loader
 import easygui as gui
 import tkinter as tk
@@ -12,89 +13,103 @@ pos = 0
 root = None
 patient = None
 
+
 def humanLengthProps(prop):
     if prop > 1.0:
         d = (prop - 1) * 100
-        return "{0:.2f}% mas largo hacia la derecha.".format(d)
+        return ms["right_displacement"].format(d)
     elif prop < 1.0:
         d = (1 - prop) * 100
-        return "{0:.2f}% mas largo hacia la izquierda.".format(d)
+        return ms["left_displacement"].format(d)
     else:
-        return "Ambos lados son de distancia identica"
+        return ms["no_displacement"]
     
 def humanAngleProps(prop):
     if prop > 1.0:
         d = (prop - 1) * 100
-        return "{0:.2f}% mas amplio hacia la derecha.".format(d)
+        return ms["right_angle_displacement"].format(d)
     elif prop < 1.0:
         d = (1 - prop) * 100
-        return "{0:.2f}% mas amplio hacia la izquierda.".format(d)
+        return ms["left_angle_displacement"].format(d)
     else:
-        return "Ambos lados son de angulo identico"
+        return ms["no_angle_displacement"]
     
-def key_up(event):
+def deleteMark():
     global pos
-    command = Workspace.processKey(root, event)
-    if command == Commands.DELETE_MARK:
-        pos = max(pos - 1, 0)
-        Workspace.deleteLastMark()
-    elif command == Commands.CLEAR_MARKS:
-        pos = 0
-        Workspace.clean()
-    elif command == Commands.START:
-        if Workspace.complete:
+    Workspace.deleteLastMark(pos)
+    pos = max(pos - 1, 0)
+    Reference.draw(pos)
+    
+def deleteAll():
+    global pos
+    Workspace.clean()
+    pos = 0
+    Reference.draw(pos)
+    
+def newPatient():
+    if Workspace.complete:
+        return Commands.START
+    else:
+        if gui.boolbox("Exiting", "You are exiting. All progress in this patient will be lost.", ["OK", "Cancel"]):
             return Commands.START
-        else:
-            if gui.boolbox("Exiting", "You are exiting. All progress in this patient will be lost.", ["OK", "Cancel"]):
-                return Commands.START
-    elif command == Commands.SHOW_PROPORTIONS:
-        if Workspace.complete:
-            prop = patient.proportions
-            
-            msg = """
-Proporciones Medida:
-    - Canto interno :   %s
-    - Canto externo :   %s
-    - Trago :           %s
-    - Reborder alar :   %s
-    - Comisura bucal :  %s
-    - Ang. mandibular : %s
-Proporciones Angulares:
-    - Glabelar - Canto interno :   %s
-    - Glabelar - Canto externo :   %s
-    - Glabelar - Trago :           %s
-    - Glabelar - Reborder alar :   %s
-    - Glabelar - Comisura bucal :  %s
-    - Glabelar - Ang. mandibular : %s
-    - Pogonion - Trago :           %s
-    - Pogonion - Comisura bucal :  %s
-    - Pogonion - Ang. mandibular : %s
-""" % (humanLengthProps(prop.internalCantLength), humanLengthProps(prop.externalCantLength),
-       humanLengthProps(prop.tragoLength), humanLengthProps(prop.rebordeAlarLength), 
-       humanLengthProps(prop.lipLength), humanLengthProps(prop.mandibleLength),
-       humanAngleProps(prop.glabelarCantoIntAngle), humanAngleProps(prop.glabelarCantoExtAngle),
-       humanAngleProps(prop.glablearTragoAngle), humanAngleProps(prop.glablearNasalAngle), 
-       humanLengthProps(prop.glablearLabialAngle), humanLengthProps(prop.glablearMadibularAngle),
-       humanAngleProps(prop.pogonionTragoAngle), humanLengthProps(prop.pogonionLabialAngle), 
-       humanLengthProps(prop.pogonionMandibularAngle))
-            gui.msgbox(msg, "measurements")                    
-    elif command == None:
-        if event.char == "q":
-            return Commands.EXIT
-                
+
+def showProportions():
+    if Workspace.complete:
+        prop = patient.proportions
+    a = {}
+    z = {}
+    x = [humanLengthProps(prop.internalCantLength), humanLengthProps(prop.externalCantLength),
+    humanLengthProps(prop.tragoLength), humanLengthProps(prop.rebordeAlarLength), 
+    humanLengthProps(prop.lipLength), humanLengthProps(prop.mandibleLength),
+    humanAngleProps(prop.glabelarCantoIntAngle), humanAngleProps(prop.glabelarCantoExtAngle),
+    humanAngleProps(prop.glablearTragoAngle), humanAngleProps(prop.glablearNasalAngle), 
+    humanLengthProps(prop.glablearLabialAngle), humanLengthProps(prop.glablearMadibularAngle),
+    humanAngleProps(prop.pogonionTragoAngle), humanLengthProps(prop.pogonionLabialAngle), 
+    humanLengthProps(prop.pogonionMandibularAngle)]
+    for i in range(len(x)):
+        a["a_" + str(i)] = x[i]
+    z = ms.copy()
+    z.update(a)
+    
+    msg = """
+{measurements_props}:
+- {internal_cant}:   {a_0}
+- {external_cant}:   {a_1}
+- {trago}:           {a_2}
+- {reborde_alar}:   {a_3}
+- {mouth}:  {a_4}
+- {mandibular_angle}: {a_5}
+{angular_proportions}:
+- {glabelar} - {internal_cant}:   {a_6}
+- {glabelar} - {external_cant}:   {a_7}
+- {glabelar} - {trago}:           {a_8}
+- {glabelar} - {reborde_alar}:   {a_9}
+- {glabelar} - {mouth}:  {a_10}
+- {glabelar} - {mandibular_angle}: {a_11}
+- {pogonion} - {trago}:           {a_12}
+- {pogonion} - {mouth}:  {a_13}
+- {pogonion} - {mandibular_angle}: {a_14}
+""".format_map(z) 
+    gui.msgbox(msg, "measurements")                    
+
+def mouse_move(event):
+    global pos
+    p = getPoint(event)
+    Workspace.processMove(p, pos)
                 
 def mouse_up(event):
-    global pos
+    global pos, patient
     p = getPoint(event)
     command = Workspace.processClick(event, p, pos)
     print(command)
     if command == Commands.NEXT:
         pos += 1
     elif command == Commands.MEASUREMENTS_DONE:
+        pos += 1
         patient = Workspace.processFullPatient(patient)
         Loader.savePatient(patient)
     Reference.processClick(p, pos)
-
+    
 def load(x_patient, complete=False, loaded=False):
     global pos, root, patient
     patient = x_patient
@@ -109,11 +124,28 @@ def load(x_patient, complete=False, loaded=False):
     right = rw + ww
     bottom = max(rh, wh)
     embed = tk.Frame(root, width = right, height = bottom)
-    embed.pack(side = tk.LEFT) #packs window to the left
+    deleteBtn = tk.Button(root, text=ms["delete_last"], command=deleteMark)
+    deleteBtn.pack()
+    clearBtn = tk.Button(root, text=ms["delete_all"], command=deleteAll)
+    clearBtn.pack()
+    Workspace.showAnglesUI = tk.BooleanVar(value=True)
+    Workspace.showMeasuresUI = tk.BooleanVar(value=True)
+    anglesCheckbox = tk.Checkbutton(root, text=ms["show_angles"], variable=Workspace.showAnglesUI, 
+                            command=Workspace.toggleAngles)
+    anglesCheckbox.pack()
+    mesauresCheckbox = tk.Checkbutton(root, text=ms["show_measures"], variable=Workspace.showMeasuresUI,
+                            command=Workspace.toggleMeasures)
+    mesauresCheckbox.pack()
+    propsBtn = tk.Button(root, text=ms["show_props"], command=showProportions)
+    propsBtn.pack()
+    
     screen = tk.Canvas(embed, width=right, height=bottom)
     screen.pack()
     Reference.load(screen, left, top, rw, rh)
     Workspace.load(screen, rw, 0, right, wh)
-    screen.bind("<Key>", key_up)
     screen.bind("<Button-1>", mouse_up)
+    screen.bind("<Motion>", mouse_move)
+    embed.pack(side = tk.LEFT) #packs window to the left
     tk.mainloop()
+    
+# "show_props": "Proportions"

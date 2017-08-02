@@ -7,6 +7,6 @@ Created on 16 Apr 2017
 BLACK = "black"
 WHITE = "white"
 LIGHT = "#eee"
-BLUE =  "blue"
-GREEN = "green"
+BLUE =  "#7d97c1"
+GREEN = "#68dd6c"
 RED =   "red"
