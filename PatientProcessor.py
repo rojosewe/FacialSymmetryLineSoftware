@@ -1,122 +1,151 @@
-import sys
-from pygame import mouse as m
 from geometry import Point
 from workAreas import Reference, Workspace
+from utils.Messages import messages as ms
 from utils import Commands, Loader
 import easygui as gui
-
-def getPoint():
-    p = m.get_pos()
-    return Point(p[0], p[1])        
+import tkinter as tk
+from facial_measures import Order
 
 pos = 0
+root = None
+patient = None
+
+def getPoint(event):
+    p = (event.x, event.y)
+    return Point(p[0], p[1])
 
 def humanLengthProps(prop):
     if prop > 1.0:
         d = (prop - 1) * 100
-        return "{0:.2f}% mas largo hacia la izquierda.".format(d)
+        return ms["right_displacement"].format(d)
     elif prop < 1.0:
         d = (1 - prop) * 100
-        return "{0:.2f}% mas largo hacia la derecha.".format(d)
+        return ms["left_displacement"].format(d)
     else:
-        return "Ambos lados son de distancia identica"
+        return ms["no_displacement"]
     
 def humanAngleProps(prop):
     if prop > 1.0:
         d = (prop - 1) * 100
-        return "{0:.2f}% mas amplio hacia la izquierda.".format(d)
+        return ms["right_angle_displacement"].format(d)
     elif prop < 1.0:
         d = (1 - prop) * 100
-        return "{0:.2f}% mas amplio hacia la derecha.".format(d)
+        return ms["left_angle_displacement"].format(d)
     else:
-        return "Ambos lados son de angulo identico"
+        return ms["no_angle_displacement"]
     
-
-def load(pygame, patient, complete=False, loaded=False):
+def deleteMark():
     global pos
-    rw, rh = Reference.init(pygame)
-    ww, wh = Workspace.init(pygame, patient)
-    if complete:
-        pos = 2000
-    left = 0
-    top = 0
-    right = rw + ww
-    bottom = max(rh, wh)
-    print(right)
-    screen = pygame.display.set_mode((right, bottom))
-    Reference.load(screen, left, top, rw, rh)
-    Workspace.load(screen, rw, 0, right, wh)
+    Workspace.deleteLastMark(pos)
+    pos = max(pos - 1, 0)
+    Reference.draw(pos)
     
-    while True:
-        P = getPoint()
-        Reference.draw(P, pos)
-        Workspace.draw(P, pos)
-        p = getPoint()
-        
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT: 
-                sys.exit()
-            elif event.type == pygame.MOUSEBUTTONUP:
-                command = Workspace.processClick(event, p, pos)
-                print(command)
-                if command == Commands.NEXT:
-                    pos += 1
-                elif command == Commands.MEASUREMENTS_DONE_REP:
-                    continue
-                elif command == Commands.MEASUREMENTS_DONE:
-                    patient = Workspace.processFullPatient(patient)
-                    Loader.savePatient(patient)
-                Reference.processClick(event, p, pos)
-            elif event.type == pygame.KEYUP:
-                command = Workspace.processKey(pygame, event)
-                if command == Commands.DELETE_MARK:
-                    pos = max(pos - 1, 0)
-                    Workspace.deleteLastMark()
-                elif command == Commands.CLEAR_MARKS:
-                    pos = 0
-                    Workspace.clean()
-                elif command == Commands.START:
-                    if Workspace.complete:
-                        return Commands.START
-                    else:
-                        if gui.boolbox("Exiting", "You are exiting. All progress in this patient will be lost.", ["OK", "Cancel"]):
-                            pygame.quit()
-                            return Commands.START
-                        else:
-                            continue
-                elif command == Commands.SHOW_PROPORTIONS:
-                    if Workspace.complete:
-                        prop = patient.proportions
-                        
-                        msg = """
-Proporciones Medida:
-    - Canto interno :   %s
-    - Canto externo :   %s
-    - Trago :           %s
-    - Reborder alar :   %s
-    - Comisura bucal :  %s
-    - Ang. mandibular : %s
-Proporciones Angulares:
-    - Glabelar - Canto interno :   %s
-    - Glabelar - Canto externo :   %s
-    - Glabelar - Trago :           %s
-    - Glabelar - Reborder alar :   %s
-    - Glabelar - Comisura bucal :  %s
-    - Glabelar - Ang. mandibular : %s
-    - Pogonion - Trago :           %s
-    - Pogonion - Comisura bucal :  %s
-    - Pogonion - Ang. mandibular : %s
-""" % (humanLengthProps(prop.internalCantLength), humanLengthProps(prop.externalCantLength),
-       humanLengthProps(prop.tragoLength), humanLengthProps(prop.rebordeAlarLength), 
-       humanLengthProps(prop.lipLength), humanLengthProps(prop.mandibleLength),
-       humanAngleProps(prop.glabelarCantoIntAngle), humanAngleProps(prop.glabelarCantoExtAngle),
-       humanAngleProps(prop.glablearTragoAngle), humanAngleProps(prop.glablearNasalAngle), 
-       humanLengthProps(prop.glablearLabialAngle), humanLengthProps(prop.glablearMadibularAngle),
-       humanAngleProps(prop.pogonionTragoAngle), humanLengthProps(prop.pogonionLabialAngle), 
-       humanLengthProps(prop.pogonionMandibularAngle))
-                        gui.msgbox(msg, "measurements")                    
-                elif command == None:
-                    if event.key == pygame.K_q:
-                        return Commands.EXIT
-                    
-        pygame.display.flip()        
+def deleteAll():
+    global pos
+    Workspace.clean()
+    pos = 0
+    Reference.draw(pos)
+    
+def newPatient():
+    if Workspace.complete:
+        return Commands.START
+    else:
+        if gui.boolbox("Exiting", "You are exiting. All progress in this patient will be lost.", ["OK", "Cancel"]):
+            return Commands.START
+
+def showProportions():
+    if Workspace.complete:
+        prop = patient.proportions
+    else:
+        return
+    a = {}
+    x = [humanLengthProps(prop.internalCantLength), humanLengthProps(prop.externalCantLength),
+    humanLengthProps(prop.tragoLength), humanLengthProps(prop.rebordeAlarLength), 
+    humanLengthProps(prop.lipLength), humanLengthProps(prop.mandibleLength),
+    humanAngleProps(prop.glabelarCantoIntAngle), humanAngleProps(prop.glabelarCantoExtAngle),
+    humanAngleProps(prop.glablearTragoAngle), humanAngleProps(prop.glablearNasalAngle), 
+    humanLengthProps(prop.glablearLabialAngle), humanLengthProps(prop.glablearMadibularAngle),
+    humanAngleProps(prop.pogonionTragoAngle), humanLengthProps(prop.pogonionLabialAngle), 
+    humanLengthProps(prop.pogonionMandibularAngle)]
+    for i in range(len(x)):
+        a["a_" + str(i)] = x[i]
+    z = ms.copy()
+    z.update(a)
+    
+    msg = """
+{measurements_props}:
+- {internal_cant}: {a_0}
+- {external_cant}: {a_1}
+- {trago}: {a_2}
+- {reborde_alar}: {a_3}
+- {mouth}: {a_4}
+- {mandibular_angle}: {a_5}
+{angular_proportions}:
+- {glabelar} - {internal_cant}: {a_6}
+- {glabelar} - {external_cant}: {a_7}
+- {glabelar} - {trago}: {a_8}
+- {glabelar} - {reborde_alar}: {a_9}
+- {glabelar} - {mouth}: {a_10}
+- {glabelar} - {mandibular_angle}: {a_11}
+- {pogonion} - {trago}: {a_12}
+- {pogonion} - {mouth}: {a_13}
+- {pogonion} - {mandibular_angle}: {a_14}
+""".format_map(z) 
+    gui.msgbox(msg, "measurements")                    
+
+def mouse_move(event):
+    global pos
+    p = getPoint(event)
+    Workspace.processMove(p, pos)
+                
+def mouse_up(event):
+    global pos, patient
+    p = getPoint(event)
+    command = Workspace.processClick(event, p, pos)
+    print(command)
+    if command == Commands.NEXT:
+        pos += 1
+    elif command == Commands.MEASUREMENTS_DONE:
+        pos += 1
+        patient = Workspace.processFullPatient(patient)
+        Loader.savePatient(patient)
+    Reference.processClick(p, pos)
+    
+def load(x_patient, complete=False, loaded=False):
+    global pos, root, patient
+    patient = x_patient
+    
+    root = tk.Tk()
+    rw, rh = Reference.init()
+    ww, wh = Workspace.init(patient)
+    Workspace.complete = complete
+    if Workspace.complete:
+        pos = len(Order.order)
+    embed = tk.Frame(root, width=rw, height=wh)
+    embed.grid(row=0, column=0)
+    refscreen = tk.Canvas(embed, width=rw, height=rh)
+    refscreen.grid(sticky=tk.W+tk.N)
+    deleteBtn = tk.Button(embed, text=ms["delete_last"], command=deleteMark, width=15)
+    Workspace.showAnglesUI = tk.BooleanVar(value=True)
+    Workspace.showMeasuresUI = tk.BooleanVar(value=True)
+    anglesCheckbox = tk.Checkbutton(embed, text=ms["show_angles"], variable=Workspace.showAnglesUI,
+                            command=Workspace.toggleAngles)
+    measuresCheckbox = tk.Checkbutton(embed, text=ms["show_measures"], variable=Workspace.showMeasuresUI,
+                            command=Workspace.toggleMeasures)
+    propsBtn = tk.Button(embed, text=ms["show_props"], command=showProportions, width=15)
+
+    clearBtn = tk.Button(embed, text=ms["delete_all"], command=deleteAll, width=15)
+
+    screen = tk.Canvas(root, width=ww, height=wh)
+    screen.grid(row=0, column=1, sticky=tk.W+tk.N)
+    anglesCheckbox.grid(sticky=tk.W)
+    measuresCheckbox.grid(sticky=tk.W)
+    propsBtn.grid(sticky=tk.W)
+    deleteBtn.grid(sticky=tk.W)
+    clearBtn.grid(sticky=tk.W+tk.S, pady=35)
+    screen.grid(sticky=tk.W)
+    Reference.load(refscreen, 0, 0, rw, rh)
+    Workspace.load(screen, 0, 0, ww, wh)
+    screen.bind("<Button-1>", mouse_up)
+    screen.bind("<Motion>", mouse_move)
+    tk.mainloop()

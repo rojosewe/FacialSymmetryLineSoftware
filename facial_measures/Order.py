@@ -25,3 +25,9 @@ order = [HORIZONTAL_LINE, TOP_HEAD, CHIN, FOREHEAD,
 EYE_OUTER_LEFT, EYE_INNER_LEFT, EYE_INNER_RIGHT, EYE_OUTER_RIGHT, 
 CHEEKBONE_LEFT, CHEEKBONE_RIGHT, NOSE_LEFT,
 NOSE_RIGHT, MOUTH_LEFT, MOUTH_RIGHT, CHEEK_LEFT, CHEEK_RIGHT]
+
+def getPos(pos):
+    if pos < len(order) and pos >= 0:
+        return order[pos]
+    else:
+        return None

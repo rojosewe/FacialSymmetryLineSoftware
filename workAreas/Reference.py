@@ -8,41 +8,51 @@ import os
 from geometry import Rect
 from facial_measures import Order
 from utils import colors as cs
-from pygame import draw as d
+from PIL import Image
+from PIL.ImageTk import PhotoImage
+
 
 img = None
-size = None
 screen = None
 rect = None
+point = None
+img_obj = None
 
-points = {Order.TOP_HEAD: (100, 56), Order.CHIN: (100, 228), 
-Order.FOREHEAD: (100, 105), Order.EYE_OUTER_LEFT: (55, 123), 
-Order.EYE_INNER_LEFT: (92, 119), Order.EYE_INNER_RIGHT: (114, 119), 
-Order.EYE_OUTER_RIGHT: (150, 123), Order.CHEEKBONE_LEFT: (30, 140), 
-Order.CHEEKBONE_RIGHT: (176, 143), Order.NOSE_LEFT: (80, 151), 
-Order.NOSE_RIGHT: (123, 152), Order.MOUTH_LEFT: (78, 181), 
-Order.MOUTH_RIGHT: (125, 181), Order.CHEEK_LEFT: (48, 209), 
-Order.CHEEK_RIGHT: (155, 207)}
+points = {Order.TOP_HEAD: (94, 56), Order.CHIN: (94, 228), 
+Order.FOREHEAD: (94, 105), Order.EYE_OUTER_LEFT: (49, 117), 
+Order.EYE_INNER_LEFT: (86, 113), Order.EYE_INNER_RIGHT: (108, 113), 
+Order.EYE_OUTER_RIGHT: (144, 117), Order.CHEEKBONE_LEFT: (24, 134), 
+Order.CHEEKBONE_RIGHT: (170, 137), Order.NOSE_LEFT: (74, 145), 
+Order.NOSE_RIGHT: (117, 146), Order.MOUTH_LEFT: (72, 175), 
+Order.MOUTH_RIGHT: (119, 176), Order.CHEEK_LEFT: (42, 203), 
+Order.CHEEK_RIGHT: (149, 201)}
 
-def init(pygame):
-    global  img, size
-    img = pygame.image.load(os.path.join("images", "reference.jpeg"))
-    size = img.get_rect().size
-    return (size[0], size[1])
+def init():
+    global  img
+    img = os.path.join("images", "reference.jpeg")
+    pil_img = Image.open(img)
+    return pil_img.size
     
 def load(screen_main, left, top, right, bottom):
-    global screen, rect
+    global screen, rect, img_obj
     screen = screen_main
     rect = Rect(left, top, right, bottom)
+    img_obj = PhotoImage(file=img)
+    screen.create_image(rect.left, rect.top, image=img_obj, anchor="nw")
 
-def processClick(event, p, pos):
-    print(p)
+def processClick(p, pos):
+    draw(pos)
 
-def draw(p, pos):
-    screen.blit(img, (rect.left, rect.top))
-    if pos < len(Order.order):
-        x = Order.order[pos]
+def draw(pos):
+    global point
+    if point is not None:
+        screen.delete(point)
+    x = Order.getPos(pos)
+    if pos:
         if x in points:
             refPoint = points[x]
             refPoint = (refPoint[0], refPoint[1])
-            d.circle(screen, cs.RED, refPoint, 4)
+            print(refPoint)
+            point = screen.create_oval(refPoint[0], refPoint[1],
+                                       refPoint[0] + 10, refPoint[1] + 10, 
+                                       fill=cs.RED, width=0)
