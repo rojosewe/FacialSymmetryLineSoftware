@@ -118,11 +118,11 @@ def getFacepos(p, pos):
                 patient.face.cheekL = p
             elif x == Order.CHEEK_RIGHT:
                 patient.face.cheekR = p
+                _auxAddMark(p)
                 pos += 1
-                complete = True
                 return Commands.MEASUREMENTS_DONE
             if pos > 0:
-                marks.append(create_mark(Mark(p, r = 4, color = cs.GREEN)))
+                _auxAddMark(p)
             print(x)
             pos += 1
             return Commands.NEXT
@@ -132,6 +132,27 @@ def getFacepos(p, pos):
         return Commands.MEASUREMENTS_DONE
     else:
         return Commands.MEASUREMENTS_DONE_REP
+    
+def _auxAddMark(p):
+    marks.append(create_mark(Mark(p, r = 4, color = cs.GREEN)))
+def loadCompletedPatient(patient):
+    _auxAddMark(patient.face.upper)
+    _auxAddMark(patient.face.chin)
+    createVline(Line(patient.face.upper, patient.face.chin, color=cs.LIGHT, w=1))
+    _auxAddMark(patient.face.middle)
+    _auxAddMark(patient.face.outer_eyeL)
+    _auxAddMark(patient.face.inner_eyeL)
+    _auxAddMark(patient.face.inner_eyeR)
+    _auxAddMark(patient.face.outer_eyeR)
+    _auxAddMark(patient.face.cheekboneL)
+    _auxAddMark(patient.face.cheekboneR)
+    _auxAddMark(patient.face.noseL)
+    _auxAddMark(patient.face.noseR)
+    _auxAddMark(patient.face.mouthL)
+    _auxAddMark(patient.face.mouthR)
+    _auxAddMark(patient.face.cheekL)
+    _auxAddMark(patient.face.cheekR)            
+    return processFullPatient(patient)
 
 def addMeasures(patient):
     global measures
@@ -178,31 +199,26 @@ def toggleMeasures():
         for measure in measures:
             screen.itemconfig(measure, state="normal")
                         
+
+def completeWorkspace(patient):
+    global complete
+    addMeasures(patient)
+    addAngles(patient)
+    complete = True
+
 def processFullPatient(patient):
     patient.measurements = facial_measures.Measurements()
     patient.angles = facial_measures.Angles()
     patient.measurements.calculate(patient.face)
     patient.angles.calculate(patient.face)
     patient.proportions.calculate(patient.measurements, patient.angles)
-    addMeasures(patient)
-    addAngles(patient)
-    complete = True
+    completeWorkspace(patient)
     return patient
 
 def deleteLastMark(pos):
     global complete, screen, marks, measures, angles
     x = Order.getPos(pos - 1)
-    if x:
-        if x == Order.HORIZONTAL_LINE:
-            removeGuideline()
-        elif x == Order.CHIN:
-            removeVline()
-            m = marks.pop()
-            screen.delete(m)
-        else:
-            m = marks.pop()
-            screen.delete(m)
-    elif complete:
+    if complete:
         for measure in measures:
             screen.delete(measure)
         for angle in angles:
@@ -212,6 +228,16 @@ def deleteLastMark(pos):
         measures.clear()
         angles.clear()
         complete = False
+    elif x:
+        if x == Order.HORIZONTAL_LINE:
+            removeGuideline()
+        elif x == Order.CHIN:
+            removeVline()
+            m = marks.pop()
+            screen.delete(m)
+        else:
+            m = marks.pop()
+            screen.delete(m)
     
 def clean():
     global complete, screen, measures, angles

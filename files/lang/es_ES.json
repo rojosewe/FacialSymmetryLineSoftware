@@ -52,5 +52,7 @@
 "no_displacement": "Ambos lados son de distancia identica",
 "right_angle_displacement": "{0:.2f}% mas amplio hacia la derecha.", 
 "left_angle_displacement": "{0:.2f}% mas amplio hacia la izquierda.",
-"no_angle_displacement": "Ambos lados son de ángulo idéntico"
+"no_angle_displacement": "Ambos lados son de ángulo idéntico",
+"on_close": "Hay trabajo no guardado. Si cierra ahora perdera el trabajo actual.",
+"error_on_img": "La imagen {} no pudo ser encontrada o no es una imagen. Cerciórese de su ubicación."
 }

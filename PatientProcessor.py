@@ -2,9 +2,10 @@ from geometry import Point
 from workAreas import Reference, Workspace
 from utils.Messages import messages as ms
 from utils import Commands, Loader
-import easygui as gui
 import tkinter as tk
+import easygui as gui
 from facial_measures import Order
+import ngui
 
 pos = 0
 root = None
@@ -111,20 +112,29 @@ def mouse_up(event):
         Loader.savePatient(patient)
     Reference.processClick(p, pos)
     
+def on_closing():
+    if not Workspace.complete: 
+        if gui.boolbox(ms["on_close"], ms["exit"], [ms["yes"], ms["no"]]):
+            root.destroy()
+            ngui.start(ngui.home)
+    else:
+        root.destroy()
+        ngui.start(ngui.home)
+    
 def load(x_patient, complete=False, loaded=False):
     global pos, root, patient
     patient = x_patient
     
     root = tk.Tk()
     rw, rh = Reference.init()
-    ww, wh = Workspace.init(patient)
-    Workspace.complete = complete
-    if Workspace.complete:
-        pos = len(Order.order)
+    try:
+        ww, wh = Workspace.init(patient)
+    except Exception:
+        raise FileNotFoundError()
     embed = tk.Frame(root, width=rw, height=wh)
     embed.grid(row=0, column=0)
     refscreen = tk.Canvas(embed, width=rw, height=rh)
-    refscreen.grid(sticky=tk.W+tk.N)
+    refscreen.grid(sticky=tk.N+tk.W)
     deleteBtn = tk.Button(embed, text=ms["delete_last"], command=deleteMark, width=15)
     Workspace.showAnglesUI = tk.BooleanVar(value=True)
     Workspace.showMeasuresUI = tk.BooleanVar(value=True)
@@ -148,4 +158,8 @@ def load(x_patient, complete=False, loaded=False):
     Workspace.load(screen, 0, 0, ww, wh)
     screen.bind("<Button-1>", mouse_up)
     screen.bind("<Motion>", mouse_move)
+    if complete:
+        pos = len(Order.order)
+        patient = Workspace.loadCompletedPatient(patient)
+    root.protocol("WM_DELETE_WINDOW", on_closing)
     tk.mainloop()

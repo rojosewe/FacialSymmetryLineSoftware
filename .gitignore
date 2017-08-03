@@ -3,5 +3,5 @@
 .DS_Store
 .metadata/
 __pycache__/
-.idea/vcs.xml
 .idea/
+files/patients.db

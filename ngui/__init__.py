@@ -89,9 +89,18 @@ def start(home_path):
 
 def openPatient(name):
     patient = Loader.openPatient(name)
-    return PatientProcessor.load(patient, complete=True, loaded=True)
+    return loadPatient(patient, True, True)
 
-
+def loadPatient(patient, complete, loaded):
+    retry = True
+    while retry:
+        try:
+            return PatientProcessor.load(patient)
+        except FileNotFoundError:
+            gui.msgbox(ms["error_on_img"].format(patient.photo))
+            retry = True
+            patient.photo = selectImage()
+        
 def fillPatientInfo():
     global patient_name
     default = ""
@@ -112,4 +121,4 @@ def fillPatientInfo():
     if image is None:
         return Commands.CREATE
     patient = Patient(name, patient_age, patient_gender, image, Face())
-    return PatientProcessor.load(patient)
+    return loadPatient(patient, False, False)

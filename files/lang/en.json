@@ -52,5 +52,7 @@ enter_info": "Enter the patient information",
 "no_displacement": "No displacement",
 "right_angle_displacement": "{0:.2f}% more ample towards the right.", 
 "left_angle_displacement": "{0:.2f}% more ample towards the left.",
-"no_angle_displacement": "No angular displacement."
+"no_angle_displacement": "No angular displacement.",
+"on_close": "There are unsaved changes. If you close now, the current workspace will be lost.",
+"error_on_img": "The image {} couldn't be found or it's not an image. Please make sure of it's location."
 }
