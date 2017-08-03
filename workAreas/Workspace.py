@@ -12,7 +12,6 @@ from utils import Commands
 import facial_measures
 from PIL import Image
 from PIL.ImageTk import PhotoImage
-from workAreas.Reference import img_obj
 
 max_v = 700
 
@@ -20,16 +19,23 @@ complete = False
 screen = None
 rect = None
 patient = None
-showMeasuresUI = True
-showAnglesUI = True
-showMeasures = True
-showAngles = True
+showLowerMeasuresUI = True
+showLowerAnglesUI = True
+showLowerMeasures = True
+showLowerAngles = True
+showUpperMeasuresUI = True
+showUpperAnglesUI = True
+showUpperMeasures = True
+showUpperAngles = True
 guideline = []
 vline = []
 marks = []
 img_obj = None
-measures = []
-angles = []
+upperMeasures = []
+upperAngles = []
+lowerMeasures = []
+lowerAngles = []
+
 
 def init(patient_value):
     global  patient, showMeasures, showAngles
@@ -155,14 +161,20 @@ def loadCompletedPatient(patient):
     return processFullPatient(patient)
 
 def addMeasures(patient):
-    global measures
-    for line in patient.measurements.getLines(patient.face, color = cs.GREEN, width = 2):
-        measures.append(create_line(line))
+    global lowerMeasures, upperMeasures
+    um, lm = patient.measurements.getLines(patient.face, color = cs.GREEN, width = 2)
+    for line in um:
+        upperMeasures.append(create_line(line))
+    for line in lm:
+        lowerMeasures.append(create_line(line))
 
 def addAngles(patient):
-    global angles
-    for line in patient.angles.getLines(patient.face, color = cs.BLUE, width = 2):
-        angles.append(create_line(line))    
+    global lowerAngles, upperAngles
+    ua, la = patient.angles.getLines(patient.face, color = cs.BLUE, width = 2)
+    for line in ua:
+        upperAngles.append(create_line(line))
+    for line in la:
+        lowerAngles.append(create_line(line))
 
 def processMove(p, pos):
     x = Order.getPos(pos)
@@ -176,27 +188,43 @@ def processClick(event, point, pos):
     return getFacepos(point, pos)
 
 
-def toggleAngles():
-    global showAngles, screen
-    showAngles = showAnglesUI.get()
-    print(showAngles)
-    if not showAngles:
-        for angle in angles:
+def toggleUpperAngles():
+    global showUpperAngles, showUpperAnglesUI, upperAngles, screen
+    showUpperAngles = showUpperAnglesUI.get()
+    print(showUpperAngles)
+    for angle in upperAngles:
+        if not showUpperAngles:
             screen.itemconfig(angle, state="hidden")
-    else:
-        
-        for angle in angles:
+        else:
             screen.itemconfig(angle, state="normal")
 
-def toggleMeasures():
-    global showMeasures, screen
-    showMeasures = showMeasuresUI.get()
-    if not showMeasures:
-        for measure in measures:
+def toggleUpperMeasures():
+    global showUpperMeasures, showUpperMeasuresUI, upperMeasures, screen
+    showUpperMeasures = showUpperMeasuresUI.get()
+    for measure in upperMeasures:
+        if not showUpperMeasures:
             screen.itemconfig(measure, state="hidden")
-    else:
-        
-        for measure in measures:
+        else:
+            screen.itemconfig(measure, state="normal")
+
+
+def toggleLowerAngles():
+    global showLowerAngles, showLowerAnglesUI, lowerAngles, screen
+    showLowerAngles = showLowerAnglesUI.get()
+    print(showLowerAngles)
+    for angle in lowerAngles:
+        if not showLowerAngles:
+            screen.itemconfig(angle, state="hidden")
+        else:
+            screen.itemconfig(angle, state="normal")
+
+def toggleLowerMeasures():
+    global showLowerMeasures, showLowerMeasuresUI, lowerMeasures, screen
+    showLowerMeasures = showLowerMeasuresUI.get()
+    for measure in lowerMeasures:
+        if not showLowerMeasures:
+            screen.itemconfig(measure, state="hidden")
+        else:
             screen.itemconfig(measure, state="normal")
                         
 
@@ -216,17 +244,23 @@ def processFullPatient(patient):
     return patient
 
 def deleteLastMark(pos):
-    global complete, screen, marks, measures, angles
+    global complete, screen, marks, lowerMeasures, upperMeasures, lowerAngles, upperAngles
     x = Order.getPos(pos - 1)
     if complete:
-        for measure in measures:
+        for measure in upperMeasures:
             screen.delete(measure)
-        for angle in angles:
+        for measure in lowerMeasures:
+            screen.delete(measure)
+        for angle in upperAngles:
+            screen.delete(angle)
+        for angle in lowerAngles:
             screen.delete(angle)
         m = marks.pop()
         screen.delete(m)
-        measures.clear()
-        angles.clear()
+        lowerMeasures.clear()
+        upperMeasures.clear()
+        lowerAngles.clear()
+        upperAngles.clear()
         complete = False
     elif x:
         if x == Order.HORIZONTAL_LINE:
@@ -240,16 +274,22 @@ def deleteLastMark(pos):
             screen.delete(m)
     
 def clean():
-    global complete, screen, measures, angles
+    global complete, screen, lowerAngles, upperAngles, lowerMeasures, upperMeasures
     removeGuideline()
     removeVline()
     for mark in marks:
         screen.delete(mark)
-    for measure in measures:
+    for measure in lowerMeasures:
         screen.delete(measure)
-    for angle in angles:
+    for measure in upperMeasures:
+        screen.delete(measure)
+    for angle in lowerAngles:
+        screen.delete(angle)
+    for angle in upperAngles:
         screen.delete(angle)
     patient.face = Face()
-    measures.clear()
-    angles.clear()
+    lowerAngles.clear()
+    upperAngles.clear()
+    lowerMeasures.clear()
+    upperMeasures.clear()
     complete = False

@@ -1,18 +1,36 @@
 
 from email.policy import default
+import json
 import os
 from os.path import expanduser
 import sys 
+
 import PatientProcessor
 import easygui as gui
 from facial_measures import Face
 from facial_measures import Patient
+import tkinter as tk
 from utils import Commands, Loader, CSV
 from utils.Messages import messages as ms
-import tkinter as tk
 
-home = expanduser("~")
+
 patient_name = None
+conf = {}
+
+def getConf():
+    global conf
+    with open('files/conf.json') as f:
+        conf = json.load(f)
+        if not os.path.isfile(conf["home"]) and  not os.path.isdir(conf["home"]):
+            conf["home"] = expanduser("~")
+
+def setConf(key, value):
+    global conf
+    conf[key] = value
+    with open('files/conf.json', "w+") as f:
+        json.dump(conf, f)
+        
+getConf()
 
 def makeInitialSelection():
     action = gui.indexbox(ms["choose_an_option"], choices=(ms["create_new_patient"], 
@@ -26,13 +44,18 @@ def makeInitialSelection():
         return Commands.OPEN
     elif action == 2:
         return Commands.EXPORT
-    elif action == 3:
+    else:
         sys.exit()
         
         
 def selectImage():
-    return gui.fileopenbox(ms["select_image"], ms["image_Selection"], default="./images",
-                     filetypes=["*.jpg", "*.jpeg", "*.png", "*.gif", "*.bmp"])
+    img = gui.fileopenbox(ms["select_image"], ms["image_Selection"], default=conf["home"],
+                     filetypes= [["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "IMAGE files"]])
+    return img
+
+def saveFilePathAsHome(file):
+    directory = os.path.abspath(file)
+    setConf("home", directory)
 
 def selectPatient():
     msg =ms["select_patient"]
@@ -80,7 +103,9 @@ def executeGUICommand(command):
         sys.exit()
     return command
 
-def start(home_path):
+def start(home_path=None):
+    if home_path is None:
+        home_path = conf["home"]
     global home
     home = home_path
     command = Commands.START
@@ -118,6 +143,7 @@ def fillPatientInfo():
     if name is None:
         return Commands.START
     image = selectImage()
+    saveFilePathAsHome(image)
     if image is None:
         return Commands.CREATE
     patient = Patient(name, patient_age, patient_gender, image, Face())

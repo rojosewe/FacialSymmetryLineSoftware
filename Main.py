@@ -7,4 +7,4 @@ import ngui
 from utils import Loader
 
 Loader.initdb()
-ngui.start("images")
+ngui.start()

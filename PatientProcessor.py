@@ -116,10 +116,10 @@ def on_closing():
     if not Workspace.complete: 
         if gui.boolbox(ms["on_close"], ms["exit"], [ms["yes"], ms["no"]]):
             root.destroy()
-            ngui.start(ngui.home)
+            ngui.start()
     else:
         root.destroy()
-        ngui.start(ngui.home)
+        ngui.start()
     
 def load(x_patient, complete=False, loaded=False):
     global pos, root, patient
@@ -136,23 +136,32 @@ def load(x_patient, complete=False, loaded=False):
     refscreen = tk.Canvas(embed, width=rw, height=rh)
     refscreen.grid(sticky=tk.N+tk.W)
     deleteBtn = tk.Button(embed, text=ms["delete_last"], command=deleteMark, width=15)
-    Workspace.showAnglesUI = tk.BooleanVar(value=True)
-    Workspace.showMeasuresUI = tk.BooleanVar(value=True)
-    anglesCheckbox = tk.Checkbutton(embed, text=ms["show_angles"], variable=Workspace.showAnglesUI,
-                            command=Workspace.toggleAngles)
-    measuresCheckbox = tk.Checkbutton(embed, text=ms["show_measures"], variable=Workspace.showMeasuresUI,
-                            command=Workspace.toggleMeasures)
+    Workspace.showUpperMeasuresUI = tk.BooleanVar(value=True)
+    Workspace.showLowerMeasuresUI = tk.BooleanVar(value=True)
+    Workspace.showUpperAnglesUI = tk.BooleanVar(value=True)
+    Workspace.showLowerAnglesUI = tk.BooleanVar(value=True)
+
+    upperAnglesCheckbox = tk.Checkbutton(embed, text=ms["show_upper_angles"], variable=Workspace.showUpperAnglesUI,
+                            command=Workspace.toggleUpperAngles)
+    lowerAnglesCheckbox = tk.Checkbutton(embed, text=ms["show_lower_angles"], variable=Workspace.showLowerAnglesUI,
+                            command=Workspace.toggleLowerAngles)
+    upperMeasuresCheckbox = tk.Checkbutton(embed, text=ms["show_upper_measures"], variable=Workspace.showUpperMeasuresUI,
+                            command=Workspace.toggleUpperMeasures)
+    lowerMeasuresCheckbox = tk.Checkbutton(embed, text=ms["show_lower_measures"], variable=Workspace.showLowerMeasuresUI,
+                            command=Workspace.toggleLowerMeasures)
     propsBtn = tk.Button(embed, text=ms["show_props"], command=showProportions, width=15)
 
     clearBtn = tk.Button(embed, text=ms["delete_all"], command=deleteAll, width=15)
 
     screen = tk.Canvas(root, width=ww, height=wh)
     screen.grid(row=0, column=1, sticky=tk.W+tk.N)
-    anglesCheckbox.grid(sticky=tk.W)
-    measuresCheckbox.grid(sticky=tk.W)
-    propsBtn.grid(sticky=tk.W)
-    deleteBtn.grid(sticky=tk.W)
-    clearBtn.grid(sticky=tk.W+tk.S, pady=35)
+    upperMeasuresCheckbox.grid(sticky=tk.W)
+    upperAnglesCheckbox.grid(sticky=tk.W)
+    lowerMeasuresCheckbox.grid(sticky=tk.W)
+    lowerAnglesCheckbox.grid(sticky=tk.W)
+    propsBtn.grid(sticky=tk.W, padx=2)
+    deleteBtn.grid(sticky=tk.W, padx=2)
+    clearBtn.grid(sticky=tk.W+tk.S, pady=35, padx=2)
     screen.grid(sticky=tk.W)
     Reference.load(refscreen, 0, 0, rw, rh)
     Workspace.load(screen, 0, 0, ww, wh)
