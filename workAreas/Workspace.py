@@ -6,7 +6,7 @@ Created on 17 Apr 2017
 
 from geometry import Rect
 from facial_measures import Face, Order
-from geometry import Point, Line, Mark
+from geometry import Point, Line, Mark, distance
 from utils import colors as cs
 from utils import Commands
 import facial_measures
@@ -14,6 +14,7 @@ from PIL import Image
 from PIL.ImageTk import PhotoImage
 
 max_v = 700
+MIN_DIST = 20
 
 complete = False
 screen = None
@@ -35,6 +36,7 @@ upperMeasures = []
 upperAngles = []
 lowerMeasures = []
 lowerAngles = []
+geopoints = []
 
 
 def init(patient_value):
@@ -85,11 +87,26 @@ def create_mark(mark):
     return screen.create_oval(mark.p.x - mark.r, mark.p.y - mark.r, mark.p.x + mark.r, 
                               mark.p.y + mark.r, fill=mark.color)
     
+def _check_distance(p1, p2):
+    if p1 is not None and p2 is not None:
+        return distance(p1, p2)
+    else:
+        return True    
+
+def checkForTooCloseNeightbors(p):
+    for p1 in geopoints:
+        if _check_distance(p1, p) < MIN_DIST:
+            return True
+    return False
+  
 def getFacepos(p, pos):
     global complete
     if inBox(p):
         x = Order.getPos(pos)
         if x:
+            if checkForTooCloseNeightbors(p):
+                return Commands.REPEAT
+
             if x == Order.HORIZONTAL_LINE:
                 createGuideline(Line(Point(p.x, rect.top), 
                                                 Point(p.x, rect.bottom), color = cs.RED))
@@ -141,6 +158,8 @@ def getFacepos(p, pos):
     
 def _auxAddMark(p):
     marks.append(create_mark(Mark(p, r = 4, color = cs.GREEN)))
+    geopoints.append(p)
+
 def loadCompletedPatient(patient):
     _auxAddMark(patient.face.upper)
     _auxAddMark(patient.face.chin)
@@ -243,8 +262,15 @@ def processFullPatient(patient):
     completeWorkspace(patient)
     return patient
 
+def _auxPopMark():
+    if len(marks) == 0:
+        return None
+    global geopoints, marks
+    geopoints.pop()
+    return marks.pop()
+
 def deleteLastMark(pos):
-    global complete, screen, marks, lowerMeasures, upperMeasures, lowerAngles, upperAngles
+    global complete, screen, lowerMeasures, upperMeasures, lowerAngles, upperAngles
     x = Order.getPos(pos - 1)
     if complete:
         for measure in upperMeasures:
@@ -255,7 +281,7 @@ def deleteLastMark(pos):
             screen.delete(angle)
         for angle in lowerAngles:
             screen.delete(angle)
-        m = marks.pop()
+        m = _auxPopMark()
         screen.delete(m)
         lowerMeasures.clear()
         upperMeasures.clear()
@@ -267,18 +293,19 @@ def deleteLastMark(pos):
             removeGuideline()
         elif x == Order.CHIN:
             removeVline()
-            m = marks.pop()
+            m = _auxPopMark()
             screen.delete(m)
         else:
-            m = marks.pop()
+            m = _auxPopMark()
             screen.delete(m)
     
 def clean():
-    global complete, screen, lowerAngles, upperAngles, lowerMeasures, upperMeasures
+    global complete, screen, marks, lowerAngles, upperAngles, lowerMeasures, upperMeasures
     removeGuideline()
     removeVline()
-    for mark in marks:
-        screen.delete(mark)
+    for i in range(len(marks)):
+        m = _auxPopMark()
+        screen.delete(m)
     for measure in lowerMeasures:
         screen.delete(measure)
     for measure in upperMeasures:

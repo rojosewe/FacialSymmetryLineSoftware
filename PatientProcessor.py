@@ -106,6 +106,8 @@ def mouse_up(event):
     print(command)
     if command == Commands.NEXT:
         pos += 1
+    elif command == Commands.REPEAT:
+        return
     elif command == Commands.MEASUREMENTS_DONE:
         pos += 1
         patient = Workspace.processFullPatient(patient)
@@ -161,7 +163,7 @@ def load(x_patient, complete=False, loaded=False):
     lowerAnglesCheckbox.grid(sticky=tk.W)
     propsBtn.grid(sticky=tk.W, padx=2)
     deleteBtn.grid(sticky=tk.W, padx=2)
-    clearBtn.grid(sticky=tk.W+tk.S, pady=35, padx=2)
+    clearBtn.grid(sticky=tk.W+tk.S, pady=35, padx=8)
     screen.grid(sticky=tk.W)
     Reference.load(refscreen, 0, 0, rw, rh)
     Workspace.load(screen, 0, 0, ww, wh)
