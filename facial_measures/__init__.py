@@ -237,47 +237,47 @@ class Angles():
         }
         
     def getLines(self, f, color=cs.BLACK, width=2):
-        upper_lines = []
-        lower_lines = []
+        upperLines = []
+        lowerLines = []
         vertical_line = geometry.Line(f.middle, f.chin, color=color, w=width)
-        upper_lines.append(vertical_line)
+        upperLines.append(vertical_line)
         line = geometry.Line(f.middle, f.outer_eyeL, color=color, w=width)
-        upper_lines.append(line)
+        upperLines.append(line)
         line = geometry.Line(f.middle, f.cheekboneL, color=color, w=width)
-        upper_lines.append(line)
+        upperLines.append(line)
         line = geometry.Line(f.middle, f.inner_eyeL, color=color, w=width)
-        upper_lines.append(line)
+        upperLines.append(line)
         line = geometry.Line(f.middle, f.cheekL, color=color, w=width)
-        upper_lines.append(line)
+        lowerLines.append(line)
         line = geometry.Line(f.middle, f.noseL, color=color, w=width)
-        upper_lines.append(line)
+        upperLines.append(line)
         line = geometry.Line(f.middle, f.mouthL, color=color, w=width)
-        upper_lines.append(line)
+        lowerLines.append(line)
         line = geometry.Line(f.middle, f.mouthR, color=color, w=width)
-        upper_lines.append(line)
+        lowerLines.append(line)
         line = geometry.Line(f.middle, f.noseR, color=color, w=width)
-        upper_lines.append(line)
+        upperLines.append(line)
         line = geometry.Line(f.middle, f.cheekR, color=color, w=width)
-        upper_lines.append(line)
+        lowerLines.append(line)
         line = geometry.Line(f.middle, f.inner_eyeR, color=color, w=width)
-        upper_lines.append(line)
+        upperLines.append(line)
         line = geometry.Line(f.middle, f.cheekboneR, color=color, w=width)
-        upper_lines.append(line)
+        upperLines.append(line)
         line = geometry.Line(f.middle, f.outer_eyeR, color=color, w=width)
-        upper_lines.append(line)
+        upperLines.append(line)
         line = geometry.Line(f.chin, f.cheekL, color=color, w=width)
-        lower_lines.append(line)
+        lowerLines.append(line)
         line = geometry.Line(f.chin, f.cheekboneL, color=color, w=width)
-        lower_lines.append(line)
+        lowerLines.append(line)
         line = geometry.Line(f.chin, f.mouthL, color=color, w=width)
-        lower_lines.append(line)
+        lowerLines.append(line)
         line = geometry.Line(f.chin, f.mouthR, color=color, w=width)
-        lower_lines.append(line)
+        lowerLines.append(line)
         line = geometry.Line(f.chin, f.cheekR, color=color, w=width)
-        lower_lines.append(line)
+        lowerLines.append(line)
         line = geometry.Line(f.chin, f.cheekboneR, color=color, w=width)
-        lower_lines.append(line)
-        return upper_lines, lower_lines
+        lowerLines.append(line)
+        return upperLines, lowerLines
         
     def __str__(self):
         return str(self.toDict())
@@ -300,6 +300,12 @@ class Proportions():
         self.pogonionMandibularAngle = None
         self.pogonionTragoAngle = None
         self.pogonionLabialAngle = None
+        self.lengthAverage = None
+        self.upperLengthAverage = None
+        self.lowerLengthAverage = None
+        self.angleAverage = None
+        self.upperAngleAverage = None
+        self.lowerAngleAverage = None
         
     def calculate(self, measurements, angles):    
         self.internalCantLength = measurements.internalCantL / measurements.internalCantR
@@ -317,6 +323,28 @@ class Proportions():
         self.pogonionMandibularAngle = angles.angle13 / angles.angle18
         self.pogonionTragoAngle = angles.angle14 / angles.angle17
         self.pogonionLabialAngle = angles.angle15 / angles.angle16
+        lengths = [self.internalCantLength, self.externalCantLength,
+                   self.tragoLength, self.rebordeAlarLength,
+                   self.lipLength, self.mandibleLength]
+        self.lengthAverage = sum(lengths) / float(len(lengths))
+        lengths = [self.internalCantLength, self.externalCantLength,
+                   self.tragoLength, self.rebordeAlarLength]
+        self.upperLengthAverage = sum(lengths) / float(len(lengths))
+        lengths = [self.lipLength, self.mandibleLength]
+        self.lowerLengthAverage = sum(lengths) / float(len(lengths))
+        angles = [self.glabelarCantoIntAngle, self.glabelarCantoExtAngle,
+                  self.glablearTragoAngle, self.glablearNasalAngle,
+                  self.glablearLabialAngle, self.glablearMadibularAngle,
+                  self.pogonionTragoAngle, self.pogonionLabialAngle,
+                  self.pogonionMandibularAngle]
+        self.angleAverage = sum(angles) / float(len(angles))
+        angles = [self.glabelarCantoIntAngle, self.glabelarCantoExtAngle,
+                              self.glablearTragoAngle, self.glablearNasalAngle]
+        self.upperAngleAverage = sum(angles) / float(len(angles))
+        angles = [self.glablearLabialAngle, self.glablearMadibularAngle,
+                  self.pogonionTragoAngle, self.pogonionLabialAngle,
+                  self.pogonionMandibularAngle]
+        self.lowerAngleAverage = sum(angles) / float(len(angles))
     
 class Patient():
     

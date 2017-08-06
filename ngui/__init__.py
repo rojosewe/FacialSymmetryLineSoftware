@@ -2,7 +2,6 @@
 from email.policy import default
 import json
 import os
-from os.path import expanduser
 import sys 
 
 import PatientProcessor
@@ -12,25 +11,9 @@ from facial_measures import Patient
 import tkinter as tk
 from utils import Commands, Loader, CSV
 from utils.Messages import messages as ms
-
+from utils.conf import Conf as cf
 
 patient_name = None
-conf = {}
-
-def getConf():
-    global conf
-    with open('files/conf.json') as f:
-        conf = json.load(f)
-        if not os.path.isfile(conf["home"]) and  not os.path.isdir(conf["home"]):
-            conf["home"] = expanduser("~")
-
-def setConf(key, value):
-    global conf
-    conf[key] = value
-    with open('files/conf.json', "w+") as f:
-        json.dump(conf, f)
-        
-getConf()
 
 def makeInitialSelection():
     action = gui.indexbox(ms["choose_an_option"], choices=(ms["create_new_patient"], 
@@ -49,13 +32,17 @@ def makeInitialSelection():
         
         
 def selectImage():
-    img = gui.fileopenbox(ms["select_image"], ms["image_Selection"], default=conf["home"],
+    img = gui.fileopenbox(ms["select_image"], ms["image_Selection"], default=cf.get("home_file"),
                      filetypes= [["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "IMAGE files"]])
     return img
 
 def saveFilePathAsHome(file):
-    directory = os.path.abspath(file)
-    setConf("home", directory)
+    file = os.path.abspath(file)
+    cf.set("home_file", file)
+    if not cf.isIn("home_dir") or not os.path.isdir(cf.get("home_dir")):
+        directory = os.path.abspath(os.path.dirname(file)) + os.sep
+        cf.set("home_dir", directory)
+
 
 def selectPatient():
     msg =ms["select_patient"]
@@ -79,7 +66,9 @@ def savePatient(patient):
             return Commands.SAVE
         
 def exportDB():
-    location = gui.filesavebox(msg=ms["choose_save_location"], title=ms["save"], default='db.csv', filetypes=["*.csv"])
+    location = gui.filesavebox(msg=ms["choose_save_location"], title=ms["save"], 
+                               default=cf.get("home_dir") + os.sep + 'db.csv', filetypes=["*.csv"])
+    cf.set("home_dir", os.path.abspath(os.path.dirname(location)))
     if location is None:
         return Commands.START
     if not location.endswith(".csv"):
@@ -104,10 +93,6 @@ def executeGUICommand(command):
     return command
 
 def start(home_path=None):
-    if home_path is None:
-        home_path = conf["home"]
-    global home
-    home = home_path
     command = Commands.START
     while 1:
         command = executeGUICommand(command)
@@ -120,7 +105,7 @@ def loadPatient(patient, complete, loaded):
     retry = True
     while retry:
         try:
-            return PatientProcessor.load(patient)
+            return PatientProcessor.load(patient, complete, loaded)
         except FileNotFoundError:
             gui.msgbox(ms["error_on_img"].format(patient.photo))
             retry = True

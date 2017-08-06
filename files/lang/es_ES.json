@@ -8,7 +8,7 @@
 "choose_an_option": "Elija una opción",
 "create_new_patient": "Crear un paciente",
 "open_patient": "Abrir un paciente existente",
-"export_to_csv": "Exportar la base de datos a CSV",
+"export_to_csv": "Exportar los datos a Excel",
 "exit": "Salir",
 "select_image": "Selecciona una imagen",
 "image_Selection": "Selección de imagen",
@@ -55,6 +55,8 @@
 "right_angle_displacement": "{0:.2f}% mas amplio hacia la derecha.", 
 "left_angle_displacement": "{0:.2f}% mas amplio hacia la izquierda.",
 "no_angle_displacement": "Ambos lados son de ángulo idéntico",
+"total_angle_move": "Diferencia angular promedio",
+"total_length_move": "Desplazamiento promedio",
 "on_close": "Hay trabajo no guardado. Si cierra ahora perdera el trabajo actual.",
 "error_on_img": "La imagen {} no pudo ser encontrada o no es una imagen. Cerciórese de su ubicación."
 }

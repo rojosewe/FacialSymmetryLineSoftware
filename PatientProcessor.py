@@ -53,7 +53,7 @@ def newPatient():
     else:
         if gui.boolbox("Exiting", "You are exiting. All progress in this patient will be lost.", ["OK", "Cancel"]):
             return Commands.START
-
+        
 def showProportions():
     if Workspace.complete:
         prop = patient.proportions
@@ -67,31 +67,73 @@ def showProportions():
     humanAngleProps(prop.glablearTragoAngle), humanAngleProps(prop.glablearNasalAngle), 
     humanLengthProps(prop.glablearLabialAngle), humanLengthProps(prop.glablearMadibularAngle),
     humanAngleProps(prop.pogonionTragoAngle), humanLengthProps(prop.pogonionLabialAngle), 
-    humanLengthProps(prop.pogonionMandibularAngle)]
+    humanLengthProps(prop.pogonionMandibularAngle), humanLengthProps(prop.lengthAverage),
+    humanLengthProps(prop.upperLengthAverage), humanLengthProps(prop.lowerLengthAverage),
+    humanAngleProps(prop.angleAverage), humanAngleProps(prop.lowerAngleAverage), 
+    humanAngleProps(prop.upperAngleAverage)]
     for i in range(len(x)):
         a["a_" + str(i)] = x[i]
     z = ms.copy()
     z.update(a)
-    
-    msg = """
-{measurements_props}:
+    msg = "{measurements_props}:".format_map(z)
+    if Workspace.showUpperMeasures:
+        msg += """
 - {internal_cant}: {a_0}
 - {external_cant}: {a_1}
 - {trago}: {a_2}
-- {reborde_alar}: {a_3}
+- {reborde_alar}: {a_3}""".format_map(z)
+    if Workspace.showLowerMeasures:
+        msg += """
 - {mouth}: {a_4}
 - {mandibular_angle}: {a_5}
-{angular_proportions}:
+""".format_map(z)
+    if Workspace.showUpperMeasures and Workspace.showLowerMeasures:
+        msg +="""
+{total_length_move}: {a_15}
+------------------------------------------------------
+""".format_map(z)
+    elif Workspace.showUpperMeasures:
+        msg +="""
+{total_length_move}: {a_16}
+------------------------------------------------------
+""".format_map(z)
+    elif Workspace.showLowerMeasures:
+        msg +="""
+{total_length_move}: {a_17}
+------------------------------------------------------
+""".format_map(z)
+
+    msg += """
+{angular_proportions}:    
+    """.format_map(z)
+    if Workspace.showUpperAngles:
+        msg += """
 - {glabelar} - {internal_cant}: {a_6}
 - {glabelar} - {external_cant}: {a_7}
 - {glabelar} - {trago}: {a_8}
-- {glabelar} - {reborde_alar}: {a_9}
+- {glabelar} - {reborde_alar}: {a_9}""".format_map(z)
+    if Workspace.showLowerAngles:
+        msg += """
 - {glabelar} - {mouth}: {a_10}
 - {glabelar} - {mandibular_angle}: {a_11}
 - {pogonion} - {trago}: {a_12}
 - {pogonion} - {mouth}: {a_13}
 - {pogonion} - {mandibular_angle}: {a_14}
-""".format_map(z) 
+""".format_map(z)
+    if Workspace.showUpperAngles and Workspace.showLowerAngles:
+        msg +="""
+{total_angle_move}: {a_18}
+""".format_map(z)
+    elif Workspace.showUpperAngles:
+        msg +="""
+{total_angle_move}: {a_19}
+""".format_map(z)
+    elif Workspace.showLowerAngles:
+        msg +="""
+{total_angle_move}: {a_20}
+""".format_map(z)
+
+    msg.format_map(z) 
     gui.msgbox(msg, "measurements")                    
 
 def mouse_move(event):
@@ -161,8 +203,8 @@ def load(x_patient, complete=False, loaded=False):
     upperAnglesCheckbox.grid(sticky=tk.W)
     lowerMeasuresCheckbox.grid(sticky=tk.W)
     lowerAnglesCheckbox.grid(sticky=tk.W)
-    propsBtn.grid(sticky=tk.W, padx=2)
-    deleteBtn.grid(sticky=tk.W, padx=2)
+    propsBtn.grid(sticky=tk.W, padx=8)
+    deleteBtn.grid(sticky=tk.W, padx=8)
     clearBtn.grid(sticky=tk.W+tk.S, pady=35, padx=8)
     screen.grid(sticky=tk.W)
     Reference.load(refscreen, 0, 0, rw, rh)
