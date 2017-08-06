@@ -18,10 +18,10 @@ def getPoint(event):
 def humanLengthProps(prop):
     if prop > 1.0:
         d = (prop - 1) * 100
-        return ms["right_displacement"].format(d)
+        return ms["left_displacement"].format(d)
     elif prop < 1.0:
         d = (1 - prop) * 100
-        return ms["left_displacement"].format(d)
+        return ms["right_displacement"].format(d)
     else:
         return ms["no_displacement"]
     
@@ -59,7 +59,7 @@ def showProportions():
         prop = patient.proportions
     else:
         return
-    a = {}
+    a = {}|  | | -> 1.5 
     x = [humanLengthProps(prop.internalCantLength), humanLengthProps(prop.externalCantLength),
     humanLengthProps(prop.tragoLength), humanLengthProps(prop.rebordeAlarLength), 
     humanLengthProps(prop.lipLength), humanLengthProps(prop.mandibleLength),
