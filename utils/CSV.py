@@ -6,21 +6,22 @@ Created on May 14, 2017
 
 import os
 
-columns = ["Nombre", "Edad", "Genero", "canto_interno_der", "canto_externo_der", "trago_der", "reborde_alar_der",
-           "comisura_labial_der", "angulo_mandibular_der", 
-           "canto_interno_izq", "canto_externo_izq", "trago_izq", "reborde_alar_izq",
-           "comisura_labial_izq", "angulo_mandibular_izq", 
+columns = ["Nombre", "Edad", "Genero", "long_canto_interno_der", "long_canto_externo_der", "long_trago_der", 
+           "long_reborde_alar_der", "long_comisura_labial_der", "long_angulo_mandibular_der", 
+           "long_canto_interno_izq", "long_canto_externo_izq", "long_trago_izq", "long_reborde_alar_izq",
+           "long_comisura_labial_izq", "angulo_mandibular_izq", 
            "ang_glabelar_canto_interno_der", "ang_glabelar_canto_externo_der", "ang_glabelar_trago_der", 
            "ang_glabelar_reborde_alar_der", "ang_glabelar_comisura_labial_der", "ang_glabelar_angulo_mandibular_der", 
            "ang_glabelar_canto_interno_izq", "ang_glabelar_canto_externo_izq", "ang_glabelar_trago_izq", 
            "ang_glabelar_reborde_alar_izq", "ang_glabelar_comisura_labial_izq", "ang_glabelar_angulo_mandibular_izq",
             "ang_pogonion_trago_der", "ang_pogonion_comisura_labial_der", "ang_pogonion_angulo_mandibular_der", 
            "ang_pogonion_trago_izq", "ang_pogonion_comisura_labial_izq", "ang_pogonion_angulo_mandibular_izq",
-           "prop_longitud_canto_interno", "prop_longitud_canto_externo", "prop_longitud_trago", "prop_longitud_reborde_alar",
-           "prop_longitud_comisura_labial", "prop_longitud_ang_mandibular", "prop_angulo_glabelar_canto_ext", 
-           "prop_angulo_glabelar_trago", "prop_angulo_glabelar_canto_int",  "prop_angulo_glabelar_ang_mandibular", 
-           "prop_angulo_glabelar_reborde_alar", "prop_angulo_pogonion_ang_mandibular", "prop_angulo_pogonion_trago", 
-           "prop_angulo_pogonion_comisura_labial"
+           "prop_longitud_canto_interno_I/D", "prop_longitud_canto_externo_I/D", "prop_longitud_trago_I/D", 
+           "prop_longitud_reborde_alar_I/D", "prop_longitud_comisura_labial_I/D", "prop_longitud_ang_mandibular_I/D", 
+           "prop_angulo_glabelar_canto_ext_I/D", "prop_angulo_glabelar_trago_I/D", "prop_angulo_glabelar_canto_int_I/D",  
+           "prop_angulo_glabelar_ang_mandibular_I/D", "prop_angulo_glabelar_reborde_alar_I/D", 
+           "prop_angulo_pogonion_ang_mandibular_I/D", "prop_angulo_pogonion_trago_I/D", 
+           "prop_angulo_pogonion_comisura_labial_I/D"
            ]
 
 def patientsToCSV(patients, file):
