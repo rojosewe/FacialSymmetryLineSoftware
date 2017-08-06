@@ -57,6 +57,6 @@
 "no_angle_displacement": "No angular displacement.",
 "total_angle_move": "Average angle difference",
 "total_length_move": "Average displacement",
-"on_close": "There are unsaved changes. If you close now, the current workspace will be lost.",
+"on_close": "There are unsaved changes. If you close now, the current workspace will be lost. Do you wish to exit anyway?",
 "error_on_img": "The image {} couldn't be found or it's not an image. Please make sure of it's location."
 }

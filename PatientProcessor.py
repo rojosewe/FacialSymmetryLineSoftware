@@ -59,7 +59,7 @@ def showProportions():
         prop = patient.proportions
     else:
         return
-    a = {}|  | | -> 1.5 
+    a = {} 
     x = [humanLengthProps(prop.internalCantLength), humanLengthProps(prop.externalCantLength),
     humanLengthProps(prop.tragoLength), humanLengthProps(prop.rebordeAlarLength), 
     humanLengthProps(prop.lipLength), humanLengthProps(prop.mandibleLength),
@@ -203,9 +203,9 @@ def load(x_patient, complete=False, loaded=False):
     upperAnglesCheckbox.grid(sticky=tk.W)
     lowerMeasuresCheckbox.grid(sticky=tk.W)
     lowerAnglesCheckbox.grid(sticky=tk.W)
-    propsBtn.grid(sticky=tk.W, padx=8)
-    deleteBtn.grid(sticky=tk.W, padx=8)
-    clearBtn.grid(sticky=tk.W+tk.S, pady=35, padx=8)
+    propsBtn.grid(sticky=tk.W, padx=6)
+    deleteBtn.grid(sticky=tk.W, padx=6)
+    clearBtn.grid(sticky=tk.W+tk.S, pady=35, padx=6)
     screen.grid(sticky=tk.W)
     Reference.load(refscreen, 0, 0, rw, rh)
     Workspace.load(screen, 0, 0, ww, wh)
