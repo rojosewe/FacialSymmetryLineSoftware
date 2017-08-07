@@ -263,9 +263,9 @@ def processFullPatient(patient):
     return patient
 
 def _auxPopMark():
+    global geopoints, marks
     if len(marks) == 0:
         return None
-    global geopoints, marks
     geopoints.pop()
     return marks.pop()
 
