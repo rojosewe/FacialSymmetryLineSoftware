@@ -1,18 +1,13 @@
-import tkinter as tk
-from PIL.ImageTk import PhotoImage
+from tkinter import *
 
-root = tk.Tk()
-embed = tk.Frame(root, width = 500, height = 500) #creates embed frame for pygame window
-embed.grid(columnspan = (600), rowspan = 500) # Adds grid
-embed.pack(side = tk.LEFT) #packs window to the left
-buttonwin = tk.Frame(root, width = 75, height = 500)
-buttonwin.pack(side = tk.LEFT)
+rows = []
+for i in range(5):
+    cols = []
+    for j in range(4):
+        e = Entry(relief=RIDGE)
+        e.grid(row=i, column=j, sticky=NSEW)
+        e.insert(END, '%d.%d' % (i, j))
+        cols.append(e)
+    rows.append(cols)
 
-w = tk.Canvas(root, width=200, height=100)
-w.pack()
-
-x = w.create_line(0, 0, 200, 100)
-w.create_line(0, 100, 200, 0, fill="red", dash=(4, 4))
-
-w.delete(x)
-tk.mainloop()
+mainloop()
