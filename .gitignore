@@ -6,3 +6,4 @@ __pycache__/
 .idea/
 files/patients.db
 files/conf.json
+*.pyc

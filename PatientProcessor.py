@@ -35,11 +35,10 @@ def newPatient():
             return Commands.START
         
 def showProportions():
-    table = ProportionsTable.showProportions(patient, Workspace.complete, Workspace.showUpperMeasures,
+    toplevel = tk.Toplevel()
+    ProportionsTable.showProportions(toplevel, patient, Workspace.complete, Workspace.showUpperMeasures,
                                              Workspace.showLowerMeasures, Workspace.showUpperAngles,
                                              Workspace.showLowerAngles)
-    msg.format_map(z)
-    gui.msgbox(msg, "measurements")                    
 
 def mouse_move(event):
     global pos
@@ -122,4 +121,5 @@ def load(x_patient, complete=False, loaded=False):
         pos = len(Order.order)
         patient = Workspace.loadCompletedPatient(patient)
     root.protocol("WM_DELETE_WINDOW", on_closing)
+    root.title("Facial Symmetry Analysis")
     tk.mainloop()

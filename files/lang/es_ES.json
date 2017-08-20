@@ -56,7 +56,13 @@
 "left_angle_displacement": "{0:.2f}% mas amplio hacia la izquierda.",
 "no_angle_displacement": "Ambos lados son de ángulo idéntico",
 "total_angle_move": "Diferencia angular promedio",
-"total_length_move": "Desplazamiento promedio",
+"total_length_move": "Diferencial de medidas promedio",
 "on_close": "Hay trabajo no guardado. Si cierra ahora perdera el trabajo actual. Desea salir?",
-"error_on_img": "La imagen {} no pudo ser encontrada o no es una imagen. Cerciórese de su ubicación."
+"error_on_img": "La imagen {} no pudo ser encontrada o no es una imagen. Cerciórese de su ubicación.",
+"measurements": "Medidas",
+"angulos": "Ángulos",
+"left": "Izquierdo",
+"right": "Derecho",
+"differential": "Diferencial",
+"orientation": "Lado mayor"
 }
