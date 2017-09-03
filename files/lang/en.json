@@ -45,7 +45,7 @@
 "trago": "Punto malar",
 "reborde_alar": "Reborder alar",
 "mouth": "Comisura bucal",
-"mandibular_angle": "Aandible angle",
+"mandibular_angle": "Mandible angle",
 "angular_proportions": "Angular proportions",
 "glabelar": "Glabelar",
 "pogonion": "Pogonión",
@@ -58,7 +58,7 @@
 "total_angle_move": "Average angle difference",
 "total_length_move": "Average displacement",
 "on_close": "There are unsaved changes. If you close now, the current workspace will be lost. Do you wish to exit anyway?",
-"error_on_img": "The image {} couldn't be found or it's not an image. Please make sure of it's location."
+"error_on_img": "The image {} couldn't be found or it's not an image. Please make sure of it's location.",
 "measurements": "Medidas",
 "angulos": "Angles",
 "left": "Left",

@@ -5,9 +5,9 @@ from workAreas.Workspace import showUpperAngles, showLowerAngles
 
 def getOrientation(p):
     if p > 1:
-        return ms.get("left")
-    if p < 1:
         return ms.get("right")
+    if p < 1:
+        return ms.get("left")
     if p == 0:
         return ""
     
@@ -33,8 +33,8 @@ def addLengthTable(tableFrame, p, m, showUpperMeasures, showLowerMeasures):
     measure_label.grid(sticky=tk.W, padx=10)
     tm = Treeview(tableFrame)
     tm["columns"] = "left", "right", "differential", "orientation"
-    tm.heading("left", text=ms.get("left"))
-    tm.heading("right", text=ms.get("right"))
+    tm.heading("left", text=ms.get("right"))
+    tm.heading("right", text=ms.get("left"))
     tm.heading("differential", text=ms.get("differential"))
     tm.heading("orientation", text=ms.get("orientation"))
     if showUpperMeasures:
@@ -72,8 +72,8 @@ def addAngleTable(tableFrame, p, a, showUpperAngles, showLowerAngles):
     angle_label.grid(sticky=tk.W, padx=10)
     tm = Treeview(tableFrame)
     tm["columns"] = "left", "right", "differential", "orientation"
-    tm.heading("left", text=ms.get("left"))
-    tm.heading("right", text=ms.get("right"))
+    tm.heading("left", text=ms.get("right"))
+    tm.heading("right", text=ms.get("left"))
     tm.heading("differential", text=ms.get("differential"))
     tm.heading("orientation", text=ms.get("orientation"))
     if showUpperAngles:
