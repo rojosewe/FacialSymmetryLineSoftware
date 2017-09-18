@@ -226,6 +226,8 @@ def openPatient(name):
     m = getMeasurements(name)
     a = getAngles(name)
     p = Patient(pe[0], pe[1], pe[2], pe[3], f, m, a)
+    p.face.calculate_additional()
+    p.measurements.calculate(p.face)
     p.proportions.calculate(m, a)
     return p
 

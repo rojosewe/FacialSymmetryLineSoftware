@@ -25,9 +25,11 @@ showLowerAnglesUI = True
 showLowerMeasures = True
 showLowerAngles = True
 showUpperMeasuresUI = True
+showMalarMeasuresUI = True
 showUpperAnglesUI = True
 showUpperMeasures = True
 showUpperAngles = True
+showMalarMeasures = True
 guideline = []
 vline = []
 marks = []
@@ -36,6 +38,7 @@ upperMeasures = []
 upperAngles = []
 lowerMeasures = []
 lowerAngles = []
+malarMeasures = []
 geopoints = []
 
 
@@ -181,11 +184,14 @@ def loadCompletedPatient(patient):
 
 def addMeasures(patient):
     global lowerMeasures, upperMeasures
-    um, lm = patient.measurements.getLines(patient.face, color = cs.GREEN, width = 2)
+    um, lm, ml = patient.measurements.getLines(patient.face, color = cs.GREEN, width = 2)
     for line in um:
         upperMeasures.append(create_line(line))
     for line in lm:
         lowerMeasures.append(create_line(line))
+    for line in ml:
+        malarMeasures.append(create_line(line))
+    
 
 def addAngles(patient):
     global lowerAngles, upperAngles
@@ -226,6 +232,14 @@ def toggleUpperMeasures():
         else:
             screen.itemconfig(measure, state="normal")
 
+def toggleMalarMeasures():
+    global showMalarMeasures, showMalarMeasuresUI, malarMeasures, screen
+    showMalarMeasures = showMalarMeasuresUI.get()
+    for measure in malarMeasures:
+        if not showMalarMeasures:
+            screen.itemconfig(measure, state="hidden")
+        else:
+            screen.itemconfig(measure, state="normal")
 
 def toggleLowerAngles():
     global showLowerAngles, showLowerAnglesUI, lowerAngles, screen
@@ -256,6 +270,7 @@ def completeWorkspace(patient):
 def processFullPatient(patient):
     patient.measurements = facial_measures.Measurements()
     patient.angles = facial_measures.Angles()
+    patient.face.calculate_additional()
     patient.measurements.calculate(patient.face)
     patient.angles.calculate(patient.face)
     patient.proportions.calculate(patient.measurements, patient.angles)

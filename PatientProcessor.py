@@ -88,7 +88,8 @@ def load(x_patient, complete=False, loaded=False):
     Workspace.showLowerMeasuresUI = tk.BooleanVar(value=True)
     Workspace.showUpperAnglesUI = tk.BooleanVar(value=True)
     Workspace.showLowerAnglesUI = tk.BooleanVar(value=True)
-
+    Workspace.showMalarMeasuresUI = tk.BooleanVar(value=True)
+    
     upperAnglesCheckbox = tk.Checkbutton(embed, text=ms["show_upper_angles"], variable=Workspace.showUpperAnglesUI,
                                          command=Workspace.toggleUpperAngles)
     lowerAnglesCheckbox = tk.Checkbutton(embed, text=ms["show_lower_angles"], variable=Workspace.showLowerAnglesUI,
@@ -99,6 +100,10 @@ def load(x_patient, complete=False, loaded=False):
     lowerMeasuresCheckbox = tk.Checkbutton(embed, text=ms["show_lower_measures"],
                                            variable=Workspace.showLowerMeasuresUI,
                                            command=Workspace.toggleLowerMeasures)
+    malarMeasuresCheckbox = tk.Checkbutton(embed, text=ms["show_malar_measures"],
+                                           variable=Workspace.showMalarMeasuresUI,
+                                           command=Workspace.toggleMalarMeasures)
+    
     propsBtn = tk.Button(embed, text=ms["show_props"], command=showProportions, width=15)
 
     clearBtn = tk.Button(embed, text=ms["delete_all"], command=deleteAll, width=15)
@@ -109,6 +114,7 @@ def load(x_patient, complete=False, loaded=False):
     upperAnglesCheckbox.grid(sticky=tk.W)
     lowerMeasuresCheckbox.grid(sticky=tk.W)
     lowerAnglesCheckbox.grid(sticky=tk.W)
+    malarMeasuresCheckbox.grid(sticky=tk.W)
     propsBtn.grid(sticky=tk.W, padx=6)
     deleteBtn.grid(sticky=tk.W, padx=6)
     clearBtn.grid(sticky=tk.W+tk.S, pady=35, padx=6)

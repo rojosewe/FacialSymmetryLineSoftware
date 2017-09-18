@@ -20,7 +20,17 @@ class Face():
         self.inner_eyeL = None
         self.outer_eyeR = None
         self.inner_eyeR = None
+        self.malarL = None
+        self.malarR = None
         
+    def calculate_additional(self):
+        malar_eye_lineL = geometry.Line(self.outer_eyeL, self.mouthL)
+        malar_nose_lineL = geometry.Line(self.noseL, self.cheekboneL)
+        self.malarL = geometry.intersects(malar_eye_lineL, malar_nose_lineL)
+        malar_eye_lineR = geometry.Line(self.outer_eyeR, self.mouthR)
+        malar_nose_lineR = geometry.Line(self.noseR, self.cheekboneR)
+        self.malarR = geometry.intersects(malar_eye_lineR, malar_nose_lineR)
+    
     def toDict(self):
         return {
             "middle": self.middle,
@@ -37,7 +47,9 @@ class Face():
             "cheekL": self.cheekL,
             "cheekR": self.cheekR,
             "mouthL": self.mouthL,
-            "mouthR": self.mouthR
+            "mouthR": self.mouthR,
+            "malarL": self.malarL,
+            "malarR": self.malarR
         }
         
     def fromDict(self, d):
@@ -56,6 +68,8 @@ class Face():
         self.inner_eyeL = d["inner_eyeL"]
         self.outer_eyeR = d["outer_eyeR"]
         self.inner_eyeR = d["inner_eyeR"]
+        self.malarL = d["malarL"]
+        self.malarR = d["malarR"]
         
     def __str__(self):
         d = self.toDict()
@@ -78,6 +92,8 @@ class Measurements():
         self.lipR= None
         self.mandibleL= None
         self.mandibleR = None
+        self.malarL = None
+        self.malarR = None
     
     def calculate(self, f):
         vertical_line = geometry.Line(f.upper, f.chin)
@@ -103,6 +119,8 @@ class Measurements():
         self.lipR = geometry.distance(f.mouthR, mouth_middle)
         self.mandibleL = geometry.distance(f.cheekL, mandible_middle)
         self.mandibleR = geometry.distance(f.cheekR, mandible_middle)
+        self.malarL = geometry.distance(f.outer_eyeL, f.malarL)
+        self.malarR = geometry.distance(f.outer_eyeR, f.malarR)
         
     def getLines(self, f, color=cs.BLACK, width=2):
         vertical_line = geometry.Line(f.upper, f.chin)
@@ -118,6 +136,7 @@ class Measurements():
         mandible_middle = geometry.intersects(mandible_line, vertical_line)
         upperLines = []
         lowerLines = []
+        malarLines = []
         upperLines.append(geometry.Line(f.inner_eyeL, eye_middle, w=width, color=color))
         upperLines.append(geometry.Line(f.inner_eyeR, eye_middle, w=width, color=color))
         upperLines.append(geometry.Line(f.outer_eyeL, eye_middle, w=width, color=color))
@@ -130,7 +149,9 @@ class Measurements():
         lowerLines.append(geometry.Line(f.mouthR, mouth_middle, w=width, color=color))
         lowerLines.append(geometry.Line(f.cheekL, mandible_middle, w=width, color=color))
         lowerLines.append(geometry.Line(f.cheekR, mandible_middle, w=width, color=color))
-        return upperLines, lowerLines
+        malarLines.append(geometry.Line(f.outer_eyeL, f.malarL, w=width, color=color))
+        malarLines.append(geometry.Line(f.outer_eyeR, f.malarR, w=width, color=color))
+        return upperLines, lowerLines, malarLines
         
     def toDict(self):
         return {
@@ -291,6 +312,7 @@ class Proportions():
         self.rebordeAlarLength = None
         self.lipLength = None
         self.mandibleLength = None
+        self.malarLength = None
         self.glabelarCantoExtAngle = None 
         self.glablearTragoAngle = None
         self.glabelarCantoIntAngle = None
@@ -314,6 +336,7 @@ class Proportions():
         self.rebordeAlarLength = measurements.rebordeAlarL / measurements.rebordeAlarR
         self.lipLength = measurements.lipL / measurements.lipR
         self.mandibleLength = measurements.mandibleL / measurements.mandibleR
+        self.malarLength = measurements.malarL / measurements.malarR
         self.glabelarCantoExtAngle = angles.angle1 / angles.angle12 
         self.glablearTragoAngle = angles.angle2 / angles.angle11
         self.glabelarCantoIntAngle = angles.angle3 / angles.angle10
