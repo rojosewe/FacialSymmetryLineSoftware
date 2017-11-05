@@ -33,6 +33,7 @@ showMalarMeasures = True
 guideline = []
 vline = []
 marks = []
+imaginary_marks = []
 img_obj = None
 upperMeasures = []
 upperAngles = []
@@ -134,6 +135,8 @@ def getFacepos(p, pos):
                 patient.face.cheekboneR = p
             elif x == Order.NOSE_LEFT:
                 patient.face.noseL = p
+            elif x == Order.NOSE_CENTER:
+                patient.face.noseC = p
             elif x == Order.NOSE_RIGHT:
                 patient.face.noseR = p
             elif x == Order.MOUTH_LEFT:
@@ -175,6 +178,7 @@ def loadCompletedPatient(patient):
     _auxAddMark(patient.face.cheekboneL)
     _auxAddMark(patient.face.cheekboneR)
     _auxAddMark(patient.face.noseL)
+    _auxAddMark(patient.face.noseC)
     _auxAddMark(patient.face.noseR)
     _auxAddMark(patient.face.mouthL)
     _auxAddMark(patient.face.mouthR)
@@ -192,6 +196,9 @@ def addMeasures(patient):
     for line in ml:
         malarMeasures.append(create_line(line))
     
+def addImaginaryMarks(patient):
+    imaginary_marks.append(create_mark(Mark(patient.face.malarL, r = 4, color = cs.GREEN)))
+    imaginary_marks.append(create_mark(Mark(patient.face.malarR, r = 4, color = cs.GREEN)))
 
 def addAngles(patient):
     global lowerAngles, upperAngles
@@ -265,6 +272,7 @@ def completeWorkspace(patient):
     global complete
     addMeasures(patient)
     addAngles(patient)
+    addImaginaryMarks(patient)
     complete = True
 
 def processFullPatient(patient):
@@ -296,12 +304,15 @@ def deleteLastMark(pos):
             screen.delete(angle)
         for angle in lowerAngles:
             screen.delete(angle)
+        for p in imaginary_marks:
+            screen.delete(p)
         m = _auxPopMark()
         screen.delete(m)
         lowerMeasures.clear()
         upperMeasures.clear()
         lowerAngles.clear()
         upperAngles.clear()
+        imaginary_marks.clear()
         complete = False
     elif x:
         if x == Order.HORIZONTAL_LINE:
@@ -329,9 +340,12 @@ def clean():
         screen.delete(angle)
     for angle in upperAngles:
         screen.delete(angle)
+    for p in imaginary_marks:
+        screen.delete(p)
     patient.face = Face()
     lowerAngles.clear()
     upperAngles.clear()
     lowerMeasures.clear()
     upperMeasures.clear()
+    imaginary_marks.clear()
     complete = False

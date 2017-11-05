@@ -37,6 +37,7 @@ def newPatient():
 def showProportions():
     toplevel = tk.Toplevel()
     ProportionsTable.showProportions(toplevel, patient, Workspace.complete, Workspace.showUpperMeasures,
+                                             Workspace.showMalarMeasures,
                                              Workspace.showLowerMeasures, Workspace.showUpperAngles,
                                              Workspace.showLowerAngles)
 

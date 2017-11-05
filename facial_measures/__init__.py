@@ -15,6 +15,7 @@ class Face():
         self.mouthL = None
         self.mouthR = None
         self.noseL = None
+        self.noseC = None
         self.noseR = None
         self.outer_eyeL = None
         self.inner_eyeL = None
@@ -43,6 +44,7 @@ class Face():
             "cheekboneL": self.cheekboneL,
             "cheekboneR": self.cheekboneR,
             "noseL": self.noseL,
+            "noseC": self.noseC,
             "noseR": self.noseR,
             "cheekL": self.cheekL,
             "cheekR": self.cheekR,
@@ -63,6 +65,7 @@ class Face():
         self.mouthL = d["mouthL"]
         self.mouthR = d["mouthR"]
         self.noseL = d["noseL"]
+        self.noseC = d["noseC"]
         self.noseR = d["noseR"]
         self.outer_eyeL = d["outer_eyeL"]
         self.inner_eyeL = d["inner_eyeL"]
@@ -94,6 +97,12 @@ class Measurements():
         self.mandibleR = None
         self.malarL = None
         self.malarR = None
+        self.noseCMalarL = None
+        self.noseCMalarR = None
+        self.noseCExternalCantL = None
+        self.noseCExternalCantR = None
+        self.noseCInternalCantL = None
+        self.noseCInternalCantR = None
     
     def calculate(self, f):
         vertical_line = geometry.Line(f.upper, f.chin)
@@ -115,6 +124,14 @@ class Measurements():
         self.tragoR = geometry.distance(f.cheekboneR, cheek_middle)
         self.rebordeAlarL = geometry.distance(f.noseL, nose_middle)
         self.rebordeAlarR = geometry.distance(f.noseR, nose_middle)
+        
+        self.noseCMalarL = geometry.distance(f.noseC, f.malarL)
+        self.noseCMalarR = geometry.distance(f.noseC, f.malarR)
+        self.noseCExternalCantL = geometry.distance(f.noseC, f.outer_eyeL)
+        self.noseCExternalCantR = geometry.distance(f.noseC, f.outer_eyeR)
+        self.noseCInternalCantL = geometry.distance(f.noseC, f.inner_eyeL)
+        self.noseCInternalCantR = geometry.distance(f.noseC, f.inner_eyeR)
+        
         self.lipL = geometry.distance(f.mouthL, mouth_middle)
         self.lipR = geometry.distance(f.mouthR, mouth_middle)
         self.mandibleL = geometry.distance(f.cheekL, mandible_middle)
@@ -145,12 +162,16 @@ class Measurements():
         upperLines.append(geometry.Line(f.cheekboneR, cheek_middle, w=width, color=color))
         upperLines.append(geometry.Line(f.noseL, nose_middle, w=width, color=color))
         upperLines.append(geometry.Line(f.noseR, nose_middle, w=width, color=color))
+        
         lowerLines.append(geometry.Line(f.mouthL, mouth_middle, w=width, color=color))
         lowerLines.append(geometry.Line(f.mouthR, mouth_middle, w=width, color=color))
         lowerLines.append(geometry.Line(f.cheekL, mandible_middle, w=width, color=color))
         lowerLines.append(geometry.Line(f.cheekR, mandible_middle, w=width, color=color))
+        
         malarLines.append(geometry.Line(f.outer_eyeL, f.malarL, w=width, color=color))
         malarLines.append(geometry.Line(f.outer_eyeR, f.malarR, w=width, color=color))
+        malarLines.append(geometry.Line(f.noseC, f.malarL, w=width, color=color))
+        malarLines.append(geometry.Line(f.noseC, f.malarR, w=width, color=color))
         return upperLines, lowerLines, malarLines
         
     def toDict(self):
@@ -194,6 +215,12 @@ class Angles():
         self.angle16 = None
         self.angle17 = None
         self.angle18 = None
+        self.angleNoseCMalarL = None
+        self.angleNoseCMalarR = None
+        self.angleNoseCExternalCantL = None
+        self.angleNoseCExternalCantR = None
+        self.angleNoseCInternalCantL = None
+        self.angleNoseCInternalCantR = None
          
     def calculate(self, f):
         vertical_line = geometry.Line(f.middle, f.chin)
@@ -234,6 +261,22 @@ class Angles():
         self.angle17 = geometry.angle(vertical_line, line)
         line = geometry.Line(f.chin, f.cheekR)
         self.angle18 = geometry.angle(vertical_line, line)
+        
+        y = geometry.Point(f.noseC.x, 0)
+        noseCVertical = geometry.Line(f.noseC, y)
+        line = geometry.Line(f.noseC, f.malarL)
+        self.angleNoseCMalarL = geometry.angle(noseCVertical, line)
+        line = geometry.Line(f.noseC, f.malarR)
+        self.angleNoseCMalarR = geometry.angle(noseCVertical, line)
+        line = geometry.Line(f.noseC, f.outer_eyeL)
+        self.angleNoseCExternalCantL = geometry.angle(noseCVertical, line)
+        line = geometry.Line(f.noseC, f.outer_eyeR)
+        self.angleNoseCExternalCantR = geometry.angle(noseCVertical, line)
+        line = geometry.Line(f.noseC, f.inner_eyeL)
+        self.angleNoseCInternalCantL = geometry.angle(noseCVertical, line)
+        line = geometry.Line(f.noseC, f.inner_eyeR)
+        self.angleNoseCInternalCantR = geometry.angle(noseCVertical, line)
+        
         
     def toDict(self):
         return {
@@ -298,6 +341,12 @@ class Angles():
         lowerLines.append(line)
         line = geometry.Line(f.chin, f.cheekboneR, color=color, w=width)
         lowerLines.append(line)
+        
+        upperLines.append(geometry.Line(f.noseC, f.outer_eyeL, w=width, color=color))
+        upperLines.append(geometry.Line(f.noseC, f.outer_eyeR, w=width, color=color))
+        upperLines.append(geometry.Line(f.noseC, f.inner_eyeL, w=width, color=color))
+        upperLines.append(geometry.Line(f.noseC, f.inner_eyeR, w=width, color=color))
+        
         return upperLines, lowerLines
         
     def __str__(self):
@@ -313,6 +362,10 @@ class Proportions():
         self.lipLength = None
         self.mandibleLength = None
         self.malarLength = None
+        self.NoseCmalarLength = None
+        self.NoseCExternalCantLength = None
+        self.NoseCInternalCantLength = None
+
         self.glabelarCantoExtAngle = None 
         self.glablearTragoAngle = None
         self.glabelarCantoIntAngle = None
@@ -328,6 +381,9 @@ class Proportions():
         self.angleAverage = None
         self.upperAngleAverage = None
         self.lowerAngleAverage = None
+        self.angleNoseCMalarAngle = None
+        self.angleNoseCExternalCantAngle = None
+        self.angleNoseCInternalCantAngle = None
         
     def calculate(self, measurements, angles):    
         self.internalCantLength = measurements.internalCantL / measurements.internalCantR
@@ -337,6 +393,10 @@ class Proportions():
         self.lipLength = measurements.lipL / measurements.lipR
         self.mandibleLength = measurements.mandibleL / measurements.mandibleR
         self.malarLength = measurements.malarL / measurements.malarR
+        self.NoseCmalarLength = measurements.noseCMalarL / measurements.noseCMalarR 
+        self.NoseCExternalCantLength = measurements.noseCExternalCantL / measurements.noseCExternalCantR
+        self.NoseCInternalCantLength = measurements.noseCInternalCantL / measurements.noseCInternalCantR
+        
         self.glabelarCantoExtAngle = angles.angle1 / angles.angle12 
         self.glablearTragoAngle = angles.angle2 / angles.angle11
         self.glabelarCantoIntAngle = angles.angle3 / angles.angle10
@@ -346,12 +406,20 @@ class Proportions():
         self.pogonionMandibularAngle = angles.angle13 / angles.angle18
         self.pogonionTragoAngle = angles.angle14 / angles.angle17
         self.pogonionLabialAngle = angles.angle15 / angles.angle16
+        self.angleNoseCMalarAngle = angles.angleNoseCMalarL / angles.angleNoseCMalarR
+        self.angleNoseCExternalCantAngle = angles.angleNoseCExternalCantL / angles.angleNoseCExternalCantR
+        self.angleNoseCInternalCantAngle = angles.angleNoseCInternalCantL / angles.angleNoseCInternalCantR
+        
         lengths = [self.internalCantLength, self.externalCantLength,
                    self.tragoLength, self.rebordeAlarLength,
-                   self.lipLength, self.mandibleLength]
+                   self.lipLength, self.mandibleLength,
+                   self.NoseCmalarLength, self.NoseCExternalCantLength, 
+                   self.NoseCInternalCantLength]
         self.lengthAverage = sum(lengths) / float(len(lengths))
         lengths = [self.internalCantLength, self.externalCantLength,
-                   self.tragoLength, self.rebordeAlarLength]
+                   self.tragoLength, self.rebordeAlarLength,
+                   self.NoseCmalarLength, self.NoseCExternalCantLength, 
+                   self.NoseCInternalCantLength]
         self.upperLengthAverage = sum(lengths) / float(len(lengths))
         lengths = [self.lipLength, self.mandibleLength]
         self.lowerLengthAverage = sum(lengths) / float(len(lengths))
@@ -359,10 +427,12 @@ class Proportions():
                   self.glablearTragoAngle, self.glablearNasalAngle,
                   self.glablearLabialAngle, self.glablearMadibularAngle,
                   self.pogonionTragoAngle, self.pogonionLabialAngle,
-                  self.pogonionMandibularAngle]
+                  self.pogonionMandibularAngle, self.angleNoseCMalarAngle,
+        self.angleNoseCExternalCantAngle, self.angleNoseCInternalCantAngle]
         self.angleAverage = sum(angles) / float(len(angles))
         angles = [self.glabelarCantoIntAngle, self.glabelarCantoExtAngle,
-                              self.glablearTragoAngle, self.glablearNasalAngle]
+                              self.glablearTragoAngle, self.glablearNasalAngle, 
+                              self.angleNoseCMalarAngle, self.angleNoseCExternalCantAngle, self.angleNoseCInternalCantAngle]
         self.upperAngleAverage = sum(angles) / float(len(angles))
         angles = [self.glablearLabialAngle, self.glablearMadibularAngle,
                   self.pogonionTragoAngle, self.pogonionLabialAngle,

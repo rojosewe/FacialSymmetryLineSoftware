@@ -1,8 +1,6 @@
 from tkinter.ttk import Treeview
 import tkinter as tk
 from utils.Messages import messages as ms
-from workAreas.Workspace import showUpperAngles, showLowerAngles,\
-    showMalarMeasures
 
 def getOrientation(p):
     if p > 1:
@@ -29,10 +27,10 @@ def getDifferential(p):
         return ""
     
 
-def addLengthTable(tableFrame, p, m, showUpperMeasures, showLowerMeasures, showMalarMeasures):
+def addLengthTable(tableFrame, p, m, showUpperMeasures, showLowerMeasures):
     measure_label = tk.Label(tableFrame, text=ms.get("measurements"))
     measure_label.grid(sticky=tk.W, padx=10)
-    tm = Treeview(tableFrame)
+    tm = Treeview(tableFrame, height=9)
     tm["columns"] = "left", "right", "differential", "orientation"
     tm.heading("left", text=ms.get("right"))
     tm.heading("right", text=ms.get("left"))
@@ -45,11 +43,13 @@ def addLengthTable(tableFrame, p, m, showUpperMeasures, showLowerMeasures, showM
         tm.insert("", 0, text=ms.get("mouth"), 
                   values=(getMeasurement(m.lipL), getMeasurement(m.lipR), 
                           getDifferential(p.lipLength), getOrientation(p.lipLength))) 
-    if showMalarMeasures:
-        tm.insert("", 0, text=ms.get("malar") + " - " + ms.get("external_cant"), 
-                  values=(getMeasurement(m.malarL), getMeasurement(m.malarR), 
-                          getDifferential(p.malarLength), getOrientation(p.malarLength)))        
     if showUpperMeasures:
+        tm.insert("", 0, text=ms.get("nasal_point") + " - " + ms.get("external_cant"), 
+                  values=(getMeasurement(m.noseCExternalCantL), getMeasurement(m.noseCExternalCantR), 
+                          getDifferential(p.NoseCExternalCantLength), getOrientation(p.NoseCExternalCantLength)))
+        tm.insert("", 0, text=ms.get("nasal_point") + " - " + ms.get("internal_cant"), 
+                  values=(getMeasurement(m.noseCInternalCantL), getMeasurement(m.noseCInternalCantR), 
+                          getDifferential(p.NoseCInternalCantLength), getOrientation(p.NoseCInternalCantLength)))
         tm.insert("", 0, text=ms.get("reborde_alar"), 
                   values=(getMeasurement(m.rebordeAlarL), getMeasurement(m.rebordeAlarR), 
                           getDifferential(p.rebordeAlarLength), getOrientation(p.rebordeAlarLength)))
@@ -71,11 +71,32 @@ def addLengthTable(tableFrame, p, m, showUpperMeasures, showLowerMeasures, showM
                                           "side": getOrientation(p.lengthAverage)}))
     average_label.grid(sticky=tk.W, padx=10)
     
+def addMalarTable(tableFrame, p, m, a, showMalarMeasures):
+    if showMalarMeasures:
+        malar_label = tk.Label(tableFrame, text=ms.get("malar"))
+        malar_label.grid(sticky=tk.W, padx=10)
+        tm = Treeview(tableFrame, height=4)
+        tm["columns"] = "left", "right", "differential", "orientation"
+        tm.heading("left", text=ms.get("right"))
+        tm.heading("right", text=ms.get("left"))
+        tm.heading("differential", text=ms.get("differential"))
+        tm.heading("orientation", text=ms.get("orientation"))
+        tm.insert("", 0, text=ms.get("malar") + " - " + ms.get("external_cant"), 
+                  values=(getMeasurement(m.malarL), getMeasurement(m.malarR), 
+                          getDifferential(p.malarLength), getOrientation(p.malarLength)))
+        tm.insert("", 0, text=ms.get("nasal_point") + " - " + ms.get("malar"), 
+                  values=(getMeasurement(m.noseCMalarL), getMeasurement(m.noseCMalarR), 
+                          getDifferential(p.NoseCmalarLength), getOrientation(p.NoseCmalarLength)))
+        tm.insert("", 0, text="{nasal_point} - {malar}".format_map(ms),
+                  values=(getAngle(a.angleNoseCMalarL), getAngle(a.angleNoseCMalarR), 
+                          getDifferential(p.angleNoseCMalarAngle), 
+                          getOrientation(p.angleNoseCMalarAngle)))
+        tm.grid()
     
 def addAngleTable(tableFrame, p, a, showUpperAngles, showLowerAngles):
     angle_label = tk.Label(tableFrame, text=ms.get("angles"))
     angle_label.grid(sticky=tk.W, padx=10)
-    tm = Treeview(tableFrame)
+    tm = Treeview(tableFrame, height=12)
     tm["columns"] = "left", "right", "differential", "orientation"
     tm.heading("left", text=ms.get("right"))
     tm.heading("right", text=ms.get("left"))
@@ -104,6 +125,14 @@ def addAngleTable(tableFrame, p, a, showUpperAngles, showLowerAngles):
                           getDifferential(p.glablearLabialAngle), 
                           getOrientation(p.glablearLabialAngle)))
     if showUpperAngles:
+        tm.insert("", 0, text="{nasal_point} - {external_cant}".format_map(ms),
+                  values=(getAngle(a.angleNoseCExternalCantL), getAngle(a.angleNoseCExternalCantR), 
+                          getDifferential(p.angleNoseCExternalCantAngle), 
+                          getOrientation(p.angleNoseCExternalCantAngle)))
+        tm.insert("", 0, text="{nasal_point} - {internal_cant}".format_map(ms),
+                  values=(getAngle(a.angleNoseCInternalCantL), getAngle(a.angleNoseCInternalCantR), 
+                          getDifferential(p.angleNoseCInternalCantAngle), 
+                          getOrientation(p.angleNoseCInternalCantAngle)))
         tm.insert("", 0, text="{glabelar} - {reborde_alar}".format_map(ms),
                   values=(getAngle(a.angle5), getAngle(a.angle8), 
                           getDifferential(p.glablearNasalAngle), 
@@ -129,12 +158,13 @@ def addAngleTable(tableFrame, p, a, showUpperAngles, showLowerAngles):
                                           "side": getOrientation(p.angleAverage)}))
     average_label.grid(sticky=tk.W, padx=10)
 
-def showProportions(tableFrame, patient, complete, showUpperMeasures, 
+def showProportions(tableFrame, patient, complete, showUpperMeasures, showMalarMeasures,
                     showLowerMeasures, showUpperAngles, showLowerAngles):
     if not complete:
         return
     p = patient.proportions
     m = patient.measurements
     a = patient.angles
-    addLengthTable(tableFrame, p, m, showUpperMeasures, showLowerMeasures, showMalarMeasures)
     addAngleTable(tableFrame, p, a, showUpperAngles, showLowerAngles)
+    addLengthTable(tableFrame, p, m, showUpperMeasures, showLowerMeasures)
+    addMalarTable(tableFrame, p, m, a, showMalarMeasures)
