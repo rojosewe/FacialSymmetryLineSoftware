@@ -8,10 +8,14 @@ class Point:
         self.y = y
         
     def get(self):
-        return (self.x, self.y)
+        return [self.x, self.y]
     
     def __str__(self):
-        return str((self.x, self.y))
+        return str([self.x, self.y])
+
+    def from_array(self, a):
+        self.x = a[0]
+        self.y = a[1]
 
 class Line:
 

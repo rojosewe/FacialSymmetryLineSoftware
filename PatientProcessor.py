@@ -1,7 +1,7 @@
 from geometry import Point
 from workAreas import Reference, Workspace, ProportionsTable
 from utils.Messages import messages as ms
-from utils import Commands, Loader
+from utils import Commands, JsonLoader
 import tkinter as tk
 import easygui as gui
 from facial_measures import Order
@@ -58,7 +58,7 @@ def mouse_up(event):
     elif command == Commands.MEASUREMENTS_DONE:
         pos += 1
         patient = Workspace.processFullPatient(patient)
-        Loader.savePatient(patient)
+        JsonLoader.savePatient(patient)
     Reference.processClick(p, pos)
     
 def on_closing():

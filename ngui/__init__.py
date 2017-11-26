@@ -7,7 +7,7 @@ import easygui as gui
 from facial_measures import Face
 from facial_measures import Patient
 import tkinter as tk
-from utils import Commands, Loader, CSV
+from utils import Commands, Loader, JsonLoader, CSV
 from utils.Messages import messages as ms
 from utils.conf import Conf as cf
 
@@ -45,7 +45,7 @@ def saveFilePathAsHome(file):
 def selectPatient():
     msg =ms["select_patient"]
     title = ms["patients"]
-    choices = Loader.getAllPatientsNames()
+    choices = JsonLoader.getAllPatientsNames()
     choice = gui.choicebox(msg, title, choices)
     if choice == None:
         return Commands.START
@@ -71,7 +71,7 @@ def exportDB():
         return Commands.START
     if not location.endswith(".csv"):
         location += ".csv"
-    patients = Loader.getAllPatients()
+    patients = JsonLoader.getAllPatients()
     CSV.patientsToCSV(patients, location)
     return Commands.START
     
@@ -96,7 +96,7 @@ def start(home_path=None):
         command = executeGUICommand(command)
 
 def openPatient(name):
-    patient = Loader.openPatient(name)
+    patient = JsonLoader.getPatient(name)
     return loadPatient(patient, True, True)
 
 def loadPatient(patient, complete, loaded):

@@ -4,7 +4,7 @@ Created on 17 Apr 2017
 @author: rweffercifue
 '''
 import ngui
-from utils import Loader
+from utils import JsonLoader
 
-Loader.initdb()
+JsonLoader.migrateDB()
 ngui.start()

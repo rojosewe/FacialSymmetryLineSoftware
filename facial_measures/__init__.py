@@ -1,6 +1,7 @@
 from geometry import distance
 import geometry
 from utils import colors as cs
+from geometry import Point
 
 class Face():
     
@@ -34,45 +35,45 @@ class Face():
     
     def toDict(self):
         return {
-            "middle": self.middle,
-            "upper": self.upper,
-            "chin": self.chin,
-            "outer_eyeL": self.outer_eyeL,
-            "inner_eyeL": self.inner_eyeL,
-            "outer_eyeR": self.outer_eyeR,
-            "inner_eyeR": self.inner_eyeR,
-            "cheekboneL": self.cheekboneL,
-            "cheekboneR": self.cheekboneR,
-            "noseL": self.noseL,
-            "noseC": self.noseC,
-            "noseR": self.noseR,
-            "cheekL": self.cheekL,
-            "cheekR": self.cheekR,
-            "mouthL": self.mouthL,
-            "mouthR": self.mouthR,
-            "malarL": self.malarL,
-            "malarR": self.malarR
+            "middle": self.middle.get(),
+            "upper": self.upper.get(),
+            "chin": self.chin.get(),
+            "outer_eyeL": self.outer_eyeL.get(),
+            "inner_eyeL": self.inner_eyeL.get(),
+            "outer_eyeR": self.outer_eyeR.get(),
+            "inner_eyeR": self.inner_eyeR.get(),
+            "cheekboneL": self.cheekboneL.get(),
+            "cheekboneR": self.cheekboneR.get(),
+            "noseL": self.noseL.get(),
+            "noseC": self.noseC.get(),
+            "noseR": self.noseR.get(),
+            "cheekL": self.cheekL.get(),
+            "cheekR": self.cheekR.get(),
+            "mouthL": self.mouthL.get(),
+            "mouthR": self.mouthR.get(),
+            "malarL": self.malarL.get(),
+            "malarR": self.malarR.get()
         }
         
     def fromDict(self, d):
-        self.middle = d["middle"]
-        self.upper = d["upper"]
-        self.chin = d["chin"]
-        self.cheekboneL = d["cheekboneL"]
-        self.cheekboneR = d["cheekboneR"]
-        self.cheekL = d["cheekL"]
-        self.cheekR = d["cheekR"]
-        self.mouthL = d["mouthL"]
-        self.mouthR = d["mouthR"]
-        self.noseL = d["noseL"]
-        self.noseC = d["noseC"]
-        self.noseR = d["noseR"]
-        self.outer_eyeL = d["outer_eyeL"]
-        self.inner_eyeL = d["inner_eyeL"]
-        self.outer_eyeR = d["outer_eyeR"]
-        self.inner_eyeR = d["inner_eyeR"]
-        self.malarL = d["malarL"]
-        self.malarR = d["malarR"]
+        self.middle = Point.from_array(d["middle"])
+        self.upper = Point.from_array(d["upper"])
+        self.chin = Point.from_array(d["chin"])
+        self.cheekboneL = Point.from_array(d["cheekboneL"])
+        self.cheekboneR = Point.from_array(d["cheekboneR"])
+        self.cheekL = Point.from_array(d["cheekL"])
+        self.cheekR = Point.from_array(d["cheekR"])
+        self.mouthL = Point.from_array(d["mouthL"])
+        self.mouthR = Point.from_array(d["mouthR"])
+        self.noseL = Point.from_array(d["noseL"])
+        self.noseC = Point.from_array(d["noseC"])
+        self.noseR = Point.from_array(d["noseR"])
+        self.outer_eyeL = Point.from_array(d["outer_eyeL"])
+        self.inner_eyeL = Point.from_array(d["inner_eyeL"])
+        self.outer_eyeR = Point.from_array(d["outer_eyeR"])
+        self.inner_eyeR = Point.from_array(d["inner_eyeR"])
+        self.malarL = Point.from_array(d["malarL"])
+        self.malarR = Point.from_array(d["malarR"])
         
     def __str__(self):
         d = self.toDict()
@@ -174,22 +175,6 @@ class Measurements():
         malarLines.append(geometry.Line(f.noseC, f.malarR, w=width, color=color))
         return upperLines, lowerLines, malarLines
         
-    def toDict(self):
-        return {
-            "internalCantL" : self.internalCantL,
-            "internalCantR" : self.internalCantR,
-            "externalCantL" : self.externalCantL,
-            "externalCantR" : self.externalCantR,
-            "tragoL" : self.tragoL,
-            "tragoR" : self.tragoR,
-            "rebordeAlarL" : self.rebordeAlarL,
-            "rebordeAlarR" : self.rebordeAlarR,
-            "lipL" : self.lipL,
-            "lipR" : self.lipR,
-            "mandibleL" : self.mandibleL,
-            "mandibleR" : self.mandibleR
-        }
-        
     def __str__(self):
         return str(self.toDict())
         
@@ -276,29 +261,6 @@ class Angles():
         self.angleNoseCInternalCantL = geometry.angle(noseCVertical, line)
         line = geometry.Line(f.noseC, f.inner_eyeR)
         self.angleNoseCInternalCantR = geometry.angle(noseCVertical, line)
-        
-        
-    def toDict(self):
-        return {
-            "glabelarCantoExtIzq" : self.angle1,
-            "glablearTragoIzq" : self.angle2,
-            "glabelarCantoIntIzq" : self.angle3,
-            "glablearMadibularIzq" : self.angle4,
-            "glablearNasalIzq" : self.angle5,
-            "glablearLabialIzq" : self.angle6,
-            "glablearLabialDer" : self.angle7,
-            "glablearNasalDer" : self.angle8,
-            "glablearMadibularDer" : self.angle9,
-            "glabelarCantoIntDer" : self.angle10,
-            "glablearTragoDer" : self.angle11,
-            "glabelarCantoExtDer" : self.angle12,
-            "pogonionMandibularIzq" : self.angle13,
-            "pogonionTragoIzq" : self.angle14,
-            "pogonionLabialIzq" : self.angle15,
-            "pogonionLabialDer" : self.angle16,
-            "pogonionTragoDer" : self.angle17,
-            "pogonionMandibularDer" : self.angle18
-        }
         
     def getLines(self, f, color=cs.BLACK, width=2):
         upperLines = []
@@ -441,7 +403,7 @@ class Proportions():
     
 class Patient():
     
-    def __init__(self, name, age, gender, photo, face=Face(), measurements=None, angles=None):
+    def __init__(self, name, age, gender, photo, face=Face(), measurements=Measurements(), angles=Angles()):
         self.name = name
         self.age = age
         self.gender = gender
