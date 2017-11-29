@@ -63,7 +63,7 @@
 "on_close": "There are unsaved changes. If you close now, the current workspace will be lost. Do you wish to exit anyway?",
 "error_on_img": "The image {} couldn't be found or it's not an image. Please make sure of it's location.",
 "measurements": "Medidas",
-"angulos": "Angles",
+"angles": "Angles",
 "left": "Left",
 "right": "Right",
 "differential": "Differential",

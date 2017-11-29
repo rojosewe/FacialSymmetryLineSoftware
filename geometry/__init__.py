@@ -13,9 +13,9 @@ class Point:
     def __str__(self):
         return str([self.x, self.y])
 
-    def from_array(self, a):
-        self.x = a[0]
-        self.y = a[1]
+    @staticmethod
+    def from_array(a):
+        return Point(a[0], a[1])
 
 class Line:
 

@@ -9,12 +9,14 @@ import datetime
 json_filepath = "files/patients.json"
 json_filepath_name = "files/patients"
 
-def migrateDB(dbpath="files/patients.db"):
+def migrateDB(dbpath="./files/patients.db"):
+    if not os.path.exists("old_dbs"):
+        os.makedirs("old_dbs")
     if os.path.isfile(dbpath):
         for patient in Loader.getAllPatients():
             savePatient(patient, False)
         if os.path.isfile(dbpath):
-            move(dbpath, "files/patients_old.db")
+            move(dbpath, "old_dbs/patients_old.db")
 
 
 def patientToJson(patient):
@@ -43,20 +45,21 @@ def getAllPatients():
 
 def getPatient(name):
     patients = loadPatients()
-    patient_dict = patients[b64encode(name)]
+    patient_dict = patients[tokey(name)]
     patient = Patient(patient_dict["name"], patient_dict["age"], patient_dict["gender"], patient_dict["photo"])
-    patient.face.fromDict(patient_dict)
+    patient.face.fromDict(patient_dict["face"])
     patient.measurements.calculate(patient.face)
     patient.angles.calculate(patient.face)
     patient.face.calculate_additional()
     patient.proportions.calculate(patient.measurements, patient.angles)
+    return patient
 
 def savePatient(patient, backup=True):
     patient_dict = patientToJson(patient)
     patients = loadPatients()
     patients[tokey(patient_dict["name"])] = patient_dict
     if backup and os.path.isfile(json_filepath):
-        copyfile(json_filepath, json_filepath_name + "_" + str(datetime.datetime.now()) + ".json")
+        copyfile(json_filepath, "old_dbs/patients" + "_" + str(datetime.datetime.now()) + ".json")
     with open(json_filepath, "w+") as f:
         json.dump(patients, f)
 

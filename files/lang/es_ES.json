@@ -63,7 +63,7 @@
 "on_close": "Hay trabajo no guardado. Si cierra ahora perdera el trabajo actual. Desea salir?",
 "error_on_img": "La imagen {} no pudo ser encontrada o no es una imagen. Cerciorese de su ubicacion.",
 "measurements": "Medidas",
-"angulos": "Angulos",
+"angles": "Angulos",
 "left": "Izquierdo",
 "right": "Derecho",
 "differential": "Diferencial",

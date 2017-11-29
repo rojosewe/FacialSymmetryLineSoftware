@@ -2,8 +2,11 @@
 from facial_measures import Patient, Face, Angles, Measurements
 from geometry import Point
 import sqlite3
+import os
 
-conn = sqlite3.connect('files/patients.db')
+dbpath = "./files/patients.db"
+if os.path.isfile(dbpath):
+    conn = sqlite3.connect(dbpath)
     
 def getFace(name):
     c = conn.cursor()

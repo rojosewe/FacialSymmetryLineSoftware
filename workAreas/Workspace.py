@@ -195,6 +195,9 @@ def addMeasures(patient):
         lowerMeasures.append(create_line(line))
     for line in ml:
         malarMeasures.append(create_line(line))
+    toggleLowerMeasures()
+    toggleUpperMeasures()
+    toggleMalarMeasures()
     
 def addImaginaryMarks(patient):
     imaginary_marks.append(create_mark(Mark(patient.face.malarL, r = 4, color = cs.GREEN)))
@@ -207,6 +210,8 @@ def addAngles(patient):
         upperAngles.append(create_line(line))
     for line in la:
         lowerAngles.append(create_line(line))
+    toggleLowerAngles()
+    toggleUpperAngles()
 
 def processMove(p, pos):
     x = Order.getPos(pos)
