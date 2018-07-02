@@ -18,43 +18,6 @@ def select_patient():
         return _open_patient(choice)
 
 
-def marked_order_as_completed(patient):
-    face = patient.face
-    add_to_processed(HORIZONTAL_LINE)
-    if face.upper is not None:
-        add_to_processed(TOP_HEAD)
-    if face.middle  is not None:
-        add_to_processed(FOREHEAD)
-    if face.chin is not None:
-        add_to_processed(CHIN)
-    if face.cheekboneL is not None:
-        add_to_processed(CHEEKBONE_LEFT)
-    if face.cheekboneR is not None:
-        add_to_processed(CHEEKBONE_RIGHT)
-    if face.cheekL is not None:
-        add_to_processed(CHEEK_LEFT)
-    if face.cheekR is not None:
-        add_to_processed(CHEEK_RIGHT)
-    if face.mouthL is not None:
-        add_to_processed(MOUTH_LEFT)
-    if face.mouthR is not None:
-        add_to_processed(MOUTH_RIGHT)
-    if face.noseL is not None:
-        add_to_processed(NOSE_LEFT)
-    if face.noseC is not None:
-        add_to_processed(NOSE_CENTER)
-    if face.noseR is not None:
-        add_to_processed(NOSE_RIGHT)
-    if face.outer_eyeL is not None:
-        add_to_processed(EYE_OUTER_LEFT)
-    if face.inner_eyeL is not None:
-        add_to_processed(EYE_INNER_LEFT)
-    if face.outer_eyeR is not None:
-        add_to_processed(EYE_OUTER_RIGHT)
-    if face.inner_eyeR is not None:
-        add_to_processed(EYE_INNER_RIGHT)
-
-
 def _open_patient(name):
     try:
         patient = JsonLoader.getPatient(name)

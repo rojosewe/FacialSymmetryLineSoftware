@@ -126,7 +126,6 @@ def assign_point_to_face_pos_and_return_if_completed(p):
             patient.face.cheekL = p
         elif x == frontal_face_order.CHEEK_RIGHT:
             patient.face.cheekR = p
-            _auxAddMark(p)
         if not frontal_face_order.is_empty():
             _auxAddMark(p)
         add_to_processed(x)
@@ -297,12 +296,12 @@ def processFullPatient(patient):
 def undo_previous_action():
     global screen, lowerMeasures, upperMeasures, lowerAngles, upperAngles
     if is_completed():
-        _delete_last_mark()
         delete_last_processed()
+        _delete_last_mark()
         delete_measures_andImaginary_marks(lowerAngles, lowerMeasures, screen, upperAngles, upperMeasures)
     elif not is_empty():
-        delete_last_processed()
         x = get_next()
+        delete_last_processed()
         if is_empty():
             removeGuideline()
         else:

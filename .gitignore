@@ -5,5 +5,7 @@
 __pycache__/
 .idea/
 files/patients.db
+files/patients.json
+files/old_dbs/
 files/conf.json
 *.pyc
