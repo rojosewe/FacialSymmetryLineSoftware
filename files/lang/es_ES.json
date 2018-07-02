@@ -70,5 +70,9 @@
   "orientation": "Lado mayor",
   "photo_mode": "modo",
   "frontal": "frontal",
-  "axial": "axial"
+  "axial": "axial",
+  "central_point": "punto central",
+  "wall_left": "pared nasal izquierda",
+  "wall_right": "pared nasal derecha",
+  "break_point": "punto de quiebre"
 }

@@ -1,10 +1,10 @@
 import easygui as gui
-from facial_measures import Face
+from facial_measures import AxialFace
 from utils.Messages import messages as ms
 from utils.conf import Conf as cf
 from workAreas.state_manager import State, get_patient
 
-from ngui import patient_ui_manager
+from ngui.patient_ui_manager import AxialPatientManager
 import os
 from utils.exceptions import LeftIncompleteException
 
@@ -17,8 +17,8 @@ def new_patient_fill_info():
     _record_gender(patient)
     _record_image(patient)
     saveImagePathAsHome(patient)
-    patient.face = Face()
-    patient_ui_manager.load()
+    patient.axial = AxialFace()
+    AxialPatientManager().load()
 
 
 def _record_name(patient):

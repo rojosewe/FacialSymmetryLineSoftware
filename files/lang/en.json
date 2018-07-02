@@ -70,5 +70,9 @@
   "orientation": "Larger side",
   "photo_mode": "mode",
   "frontal": "frontal",
-  "axial": "axial"
+  "axial": "axial",
+  "central_point": "central point",
+  "wall_left": "left nasal wall",
+  "wall_right": "right nasal wall",
+  "break_point": "break point"
 }

@@ -32,7 +32,8 @@ def patientToJson(patient):
         "age": patient.age,
         "gender": patient.gender,
         "photo": patient.photo,
-        "face": patient.face.toDict()
+        "face": patient.face.toDict(),
+        "axial": patient.axial.toDict()
     }
     return patientinfo
 
@@ -57,7 +58,8 @@ def getPatient(name):
     patients = loadPatients()
     patient_dict = patients[tokey(name)]
     patient = Patient(patient_dict["name"], patient_dict["age"], patient_dict["gender"], patient_dict["photo"])
-    patient.face.fromDict(patient_dict["face"])
+    patient.axial.fromDict(patient_dict.get("axial", None))
+    patient.face.fromDict(patient_dict.get("face", None))
     patient.measurements.calculate(patient.face)
     patient.angles.calculate(patient.face)
     patient.face.calculate_additional()

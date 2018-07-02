@@ -1,5 +1,5 @@
 
-from facial_measures import Patient, Face, Angles, Measurements
+from facial_measures import Patient
 from geometry import Point
 import sqlite3
 import os

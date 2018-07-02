@@ -1,10 +1,10 @@
 from utils import JsonLoader
-from ngui import patient_ui_manager
+from ngui.patient_ui_manager import AxialPatientManager
 import easygui as gui
 from utils.Messages import messages as ms
 from utils.conf import Conf as cf
 from workAreas.state_manager import set_patient
-from facial_measures.frontal_face_order import *
+from facial_measures.order import AxialOrder
 
 
 def select_patient():
@@ -22,8 +22,9 @@ def _open_patient(name):
     try:
         patient = JsonLoader.getPatient(name)
         set_patient(patient)
-        marked_order_as_completed(patient)
-        return patient_ui_manager.load()
+        AxialOrder.marked_order_as_completed(patient)
+        patient_manager = AxialPatientManager()
+        return patient_manager.load()
     except FileNotFoundError:
         gui.msgbox(ms["error_on_img"].format(patient.photo))
         patient.photo = _load_select_image()
