@@ -436,6 +436,7 @@ class Proportions():
                   self.malarNoseAngle]
         self.malarAngleAverage = sum(angles) / float(len(angles))
 
+
 class Patient():
     
     def __init__(self, name, age, gender, photo, face=Face(), measurements=Measurements(), angles=Angles()):
