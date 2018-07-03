@@ -17,6 +17,8 @@ class PatientManager:
         ww, wh = self.workspace.get_image_size()
         embed = tk.Frame(self.root, width=rw, height=wh)
         embed.grid(row=0, column=0)
+        next_point_label = tk.Label(embed, text=ms.get("next_point") + ":")
+        next_point_label.grid(sticky=tk.W, padx=10)
         refscreen = tk.Canvas(embed, width=rw, height=rh)
         refscreen.grid(sticky=tk.N + tk.W)
         screen = self.load_ui_wokspace(embed, self.root, wh, ww)

@@ -11,6 +11,8 @@ from utils import colors as cs
 from PIL import Image
 from PIL.ImageTk import PhotoImage
 
+REF_WIDTH = 200
+REF_HEIGHT = 250
 
 class Reference:
 
@@ -22,12 +24,14 @@ class Reference:
     def load_screen(self, screen, left, top, right, bottom):
         self.screen = screen
         self.rect = Rect(left, top, right, bottom)
-        self.img_obj = PhotoImage(Image.open(self.img))
+        self.img_obj = Image.open(self.img)
+        self.img_obj = self.img_obj.resize((REF_WIDTH, REF_HEIGHT), Image.ANTIALIAS)
+        self.img_obj = PhotoImage(self.img_obj)
         self.screen.create_image(self.rect.left, self.rect.top, image=self.img_obj, anchor="nw")
-        screen.create_image(self.rect.left, self.rect.top, image=self.img_obj, anchor="nw")
+
 
     def get_image_size(self):
-        return self.pil_img.size
+        return REF_WIDTH, REF_HEIGHT
 
     def process_click(self):
         self.draw()
@@ -53,13 +57,12 @@ class AxialReference(Reference):
         self.point = None
         self.pil_img = None
         self.order = None
-        print(os.path.isfile(os.path.join("files", "images", "reference.jpeg")))
-        self.img = os.path.join("files", "images", "reference.jpeg")
+        self.img = os.path.join("files", "images", "ax-ref.JPG")
         self.order = AxialOrder
         self.pil_img = Image.open(self.img)
-        self.points = {AxialOrder.CENTRAL_POINT: (94, 228), AxialOrder.POINT_NOSE: (94, 56),
-                       AxialOrder.BREAK_POINT: (94, 105), AxialOrder.WALL_LEFT: (49, 117),
-                       AxialOrder.WALL_RIGHT: (144, 117)}
+        self.points = {AxialOrder.CENTRAL_POINT: (96, 194), AxialOrder.POINT_NOSE: (96, 14),
+                       AxialOrder.BREAK_POINT: (95, 89), AxialOrder.WALL_LEFT: (62, 103),
+                       AxialOrder.WALL_RIGHT: (130, 103)}
 
     def load_screen(self, screen, left, top, right, bottom):
         Reference.load_screen(self, screen, left, top, right, bottom)

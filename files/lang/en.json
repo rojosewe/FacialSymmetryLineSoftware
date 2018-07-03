@@ -78,5 +78,6 @@
   "walls": "nasal walls",
   "break_point": "break point",
   "angle": "Angle",
-  "deviation": "Deviation"
+  "deviation": "Deviation",
+  "next_point": "Next point"
 }
