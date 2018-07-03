@@ -16,13 +16,15 @@ class Order:
 
     @classmethod
     def add_to_processed(cls, point):
-        cls.to_process.remove(point)
-        if point not in cls.processed:
-            cls.processed.append(point)
+        if point in cls.to_process:
+            cls.to_process.remove(point)
+            if point not in cls.processed:
+                cls.processed.append(point)
 
     @classmethod
     def delete_last_processed(cls):
-        cls.to_process.insert(0, cls.processed.pop())
+        if not cls.is_empty():
+            cls.to_process.insert(0, cls.processed.pop())
 
     @classmethod
     def delete_all_processed(cls):
@@ -58,13 +60,13 @@ class AxialOrder(Order):
 
     @classmethod
     def _return_face_map(cls, patient):
-        face = patient.face
+        axial = patient.axial
         return {
-            cls.CENTRAL_POINT: face.middle,
-            cls.BREAK_POINT: face.middle,
-            cls.POINT_NOSE: face.upper,
-            cls.WALL_LEFT: face.cheekboneL,
-            cls.WALL_RIGHT: face.cheekboneR
+            cls.CENTRAL_POINT: axial.central_point,
+            cls.BREAK_POINT: axial.break_point,
+            cls.POINT_NOSE: axial.point_nose,
+            cls.WALL_LEFT: axial.wall_left,
+            cls.WALL_RIGHT: axial.wall_right
         }
 
     @classmethod

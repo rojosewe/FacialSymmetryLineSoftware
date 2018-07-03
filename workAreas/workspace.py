@@ -38,8 +38,8 @@ class AxialWorkspace:
         w = int(h * proportion)
         return w, h
     
-    def load(self, screen_main, left, top, right, bottom):
-        self.screen = screen_main
+    def load_screen(self, screen, left, top, right, bottom):
+        self.screen = screen
         self.rect = Rect(left, top, right, bottom)
         self.img_obj = Image.open(self.patient.photo)
         self.img_obj = self.img_obj.resize((right - left, bottom - top), Image.ANTIALIAS)
@@ -73,9 +73,9 @@ class AxialWorkspace:
                 self.patient.axial.wall_left = p
             elif x == AxialOrder.WALL_RIGHT:
                 self.patient.axial.wall_right = p
+            AxialOrder.add_to_processed(x)
             if not AxialOrder.is_empty():
                 self._auxAddMark(p)
-            AxialOrder.add_to_processed(x)
         complete_now = AxialOrder.is_completed()
         if complete_now and not complete_before:
             return True
@@ -83,8 +83,7 @@ class AxialWorkspace:
             return False
 
     def createGuideline(self, line):
-        self.guideline = line
-        self.create_line(self.guideline)
+        self.guideline = self.create_line(line)
 
     def removeGuideline(self):
         self.screen.delete(self.guideline)
@@ -116,7 +115,7 @@ class AxialWorkspace:
         self.pixel_points.append(p)
 
     def addAngles(self, patient):
-        lines = patient.axial.angles.getLines(patient.face, color = cs.BLUE, width = 2)
+        lines = patient.axial.angles.getLines(patient.axial, color = cs.BLUE, width = 2)
         for line in lines:
             self.lines.append(self.create_line(line))
 
@@ -134,37 +133,36 @@ class AxialWorkspace:
         self.addAngles(patient)
 
     def processFullPatient(self, patient):
-        patient.angles.calculate(patient.face)
-        patient.proportions.calculate(patient.angles)
+        patient.axial.angles.calculate(patient.axial)
+        patient.axial.proportions.calculate(patient.axial, patient.axial.angles)
         self.completeWorkspace(patient)
         return patient
 
 
     def undo_previous_action(self):
-        if AxialOrder.is_completed():
-            AxialOrder.delete_last_processed()
-            self._delete_last_mark()
-        elif not AxialOrder.is_empty():
-            x = AxialOrder.get_next()
-            AxialOrder.delete_last_processed()
-            if AxialOrder.is_empty():
-                self.removeGuideline()
-            else:
-                self._delete_last_mark()
+        for line in self.lines:
+            self.screen.delete(line)
+        AxialOrder.delete_last_processed()
+        self._delete_last_mark()
+        if AxialOrder.is_empty():
+            self.removeGuideline()
 
     def clean(self):
         for i in range(len(self.green_marks)):
             self._delete_last_mark()
+        for line in self.lines:
+            self.screen.delete(line)
         AxialOrder.delete_all_processed()
         self.removeGuideline()
         self.patient.axial = AxialFace()
 
     def _delete_last_mark(self):
         if len(self.green_marks) == 0:
+            self.pixel_points.clear()
             return None
         self.pixel_points.pop()
         m = self.green_marks.pop()
-        screen.delete(m)
+        self.screen.delete(m)
 
     def restart(self):
         self.clean()

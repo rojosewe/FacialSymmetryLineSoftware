@@ -71,8 +71,12 @@
   "photo_mode": "mode",
   "frontal": "frontal",
   "axial": "axial",
+  "nose_point": "nasal point",
   "central_point": "central point",
   "wall_left": "left nasal wall",
   "wall_right": "right nasal wall",
-  "break_point": "break point"
+  "walls": "nasal walls",
+  "break_point": "break point",
+  "angle": "Angle",
+  "deviation": "Deviation"
 }

@@ -63,9 +63,9 @@ class AxialFace:
             line = geometry.Line(f.central_point, f.wall_right)
             self.central_point_wall_right = geometry.angle(vertical_line, line)
             self.break_point_nose_point = geometry.angle(vertical_line, break_line)
-            line = geometry.Line(f.point_nose, f.wall_left)
+            line = geometry.Line(f.wall_left, f.point_nose)
             self.nose_point_wall_left = geometry.angle(break_line, line)
-            line = geometry.Line(f.point_nose, f.wall_right)
+            line = geometry.Line(f.wall_right, f.point_nose)
             self.nose_point_wall_right = geometry.angle(break_line, line)
         
         def getLines(self, f, color=cs.BLACK, width=2):
@@ -93,10 +93,12 @@ class AxialFace:
         def __init__(self):
             self.central_point_wall = None
             self.nose_point_wall = None
+            self.break_point_nose_point = None
 
-        def calculate(self, angles):
+        def calculate(self, axial, angles):
             self.central_point_wall = angles.central_point_wall_left / angles.central_point_wall_right
             self.nose_point_wall = angles.nose_point_wall_left / angles.nose_point_wall_right
+            self.break_point_nose_point = -1 if axial.point_nose.x > axial.break_point.x else 1
 
 
 class Patient:
@@ -106,8 +108,6 @@ class Patient:
         self.age = age
         self.gender = gender
         self.photo = photo
-        self.measurements = None
-        self.angles = None
         self.axial = axial
         
     def __str__(self):

@@ -22,4 +22,4 @@ class State:
     @classmethod
     def clear(cls):
         cls.patient = Patient(None, None, 18, None)
-        AxialOrder.Ostart_over()
+        AxialOrder.start_over()

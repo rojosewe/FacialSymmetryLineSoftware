@@ -7,6 +7,7 @@ from shutil import copyfile, move
 import datetime
 from workAreas.state_manager import get_patient
 
+axial_json_filepath = os.path.join("files", "axial.json")
 json_filepath = os.path.join("files", "patients.json")
 json_filepath_name = os.path.join("files", "patients")
 old_dbs_path = os.path.join("files", "old_dbs")
@@ -32,13 +33,12 @@ def patientToJson(patient):
         "age": patient.age,
         "gender": patient.gender,
         "photo": patient.photo,
-        "face": patient.face.toDict(),
         "axial": patient.axial.toDict()
     }
     return patientinfo
 
 
-def loadPatients(filepath=json_filepath):
+def loadPatients(filepath=axial_json_filepath):
     if os.path.isfile(filepath):
         with open(filepath, "r+") as f:
             return json.load(f)
@@ -59,11 +59,8 @@ def getPatient(name):
     patient_dict = patients[tokey(name)]
     patient = Patient(patient_dict["name"], patient_dict["age"], patient_dict["gender"], patient_dict["photo"])
     patient.axial.fromDict(patient_dict.get("axial", None))
-    patient.face.fromDict(patient_dict.get("face", None))
-    patient.measurements.calculate(patient.face)
-    patient.angles.calculate(patient.face)
-    patient.face.calculate_additional()
-    patient.proportions.calculate(patient.measurements, patient.angles)
+    patient.axial.angles.calculate(patient.axial)
+    patient.axial.proportions.calculate(patient.axial, patient.axial.angles)
     return patient
 
 
@@ -72,10 +69,10 @@ def savePatient(backup=True):
     patient_dict = patientToJson(patient)
     patients = loadPatients()
     patients[tokey(patient_dict["name"])] = patient_dict
-    if backup and os.path.isfile(json_filepath):
-        bkup_file = os.path.join(old_dbs_path, "patients" + "_" + str(datetime.datetime.now()) + ".json")
-        copyfile(json_filepath, bkup_file)
-    with open(json_filepath, "w+") as f:
+    if backup and os.path.isfile(axial_json_filepath):
+        bkup_file = os.path.join(old_dbs_path, "axial_patients" + "_" + str(datetime.datetime.now()) + ".json")
+        copyfile(axial_json_filepath, bkup_file)
+    with open(axial_json_filepath, "w+") as f:
         json.dump(patients, f)
 
 def tokey(name):

@@ -30,7 +30,7 @@ class Line:
             self.slope = ((p2.y - p1.y)/(p2.x - p1.x))
         
     def __str__(self):
-        return (self.p1.x, self.p2.x) + "," + (self.p1.y, self.p2.y)
+        return str((self.p1.x, self.p2.x)) + "," + str((self.p1.y, self.p2.y))
     
     def getFormulaicValues(self):
         A = (self.p1.y - self.p2.y)
