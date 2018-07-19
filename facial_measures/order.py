@@ -53,7 +53,7 @@ class AxialOrder(Order):
     WALL_LEFT = "LEFT NASAL WALL"
     WALL_RIGHT = "RIGHT NASAL WALL"
 
-    order = [CENTRAL_POINT, POINT_NOSE, BREAK_POINT, WALL_LEFT, WALL_RIGHT]
+    order = [CENTRAL_POINT, BREAK_POINT, WALL_RIGHT, WALL_LEFT, POINT_NOSE]
 
     to_process = order.copy()
     processed = []

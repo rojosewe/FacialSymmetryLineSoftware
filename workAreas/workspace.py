@@ -62,20 +62,24 @@ class AxialWorkspace:
         complete_before = AxialOrder.is_completed()
         x = AxialOrder.get_next()
         if self.in_box(p) and x and not self.checkForTooCloseNeightbors(p):
+            color = cs.GREEN
             if x == AxialOrder.CENTRAL_POINT:
                 self.createGuideline(Line(Point(p.x, self.rect.top), Point(p.x, p.y), color=cs.RED))
                 self.patient.axial.central_point = p
+                color = cs.RED
             elif x == AxialOrder.POINT_NOSE:
                 self.patient.axial.point_nose = p
+                color = cs.YELLOW
             elif x == AxialOrder.BREAK_POINT:
                 self.patient.axial.break_point = p
+                color = cs.BLUE
             elif x == AxialOrder.WALL_LEFT:
                 self.patient.axial.wall_left = p
             elif x == AxialOrder.WALL_RIGHT:
                 self.patient.axial.wall_right = p
             AxialOrder.add_to_processed(x)
             if not AxialOrder.is_empty():
-                self._auxAddMark(p)
+                self._auxAddMark(p, r=6, color=color)
         complete_now = AxialOrder.is_completed()
         if complete_now and not complete_before:
             return True
@@ -103,19 +107,19 @@ class AxialWorkspace:
 
     def complete_visuals_if_patient_is_completed(self, patient):
         if AxialOrder.is_completed():
-            self._auxAddMark(patient.axial.central_point)
-            self._auxAddMark(patient.axial.break_point)
-            self._auxAddMark(patient.axial.point_nose)
-            self._auxAddMark(patient.axial.wall_left)
-            self._auxAddMark(patient.axial.wall_right)
+            self._auxAddMark(patient.axial.central_point, 6, cs.RED)
+            self._auxAddMark(patient.axial.break_point, 6, cs.BLUE)
+            self._auxAddMark(patient.axial.point_nose, 6, cs.YELLOW)
+            self._auxAddMark(patient.axial.wall_left, 6)
+            self._auxAddMark(patient.axial.wall_right, 6)
             self.processFullPatient(patient)
 
-    def _auxAddMark(self, p):
-        self.green_marks.append(self.create_mark(Mark(p, r=4, color=cs.GREEN)))
+    def _auxAddMark(self, p, r=6, color=cs.GREEN):
+        self.green_marks.append(self.create_mark(Mark(p, r=r, color=color)))
         self.pixel_points.append(p)
 
     def addAngles(self, patient):
-        lines = patient.axial.angles.getLines(patient.axial, color = cs.BLUE, width = 2)
+        lines = patient.axial.angles.getLines(patient.axial, color=cs.BLUE, width=4)
         for line in lines:
             self.lines.append(self.create_line(line))
 
