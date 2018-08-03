@@ -51,8 +51,8 @@ class AxialWorkspace:
         return p.x >= self.rect.left and p.x < self.rect.right and p.y >= self.rect.top and p.y < self.rect.bottom
 
     def create_line(self, line):
-        return self.screen.create_line(line.p1.x, line.p1.y,
-                                  line.p2.x, line.p2.y, fill=line.color, width=line.w)
+        return self.screen.create_line(line.p1.x, line.p1.y,line.p2.x, line.p2.y,
+                                       fill=line.color, width=line.w, dash=line.dash)
 
     def create_mark(self, mark):
         return self.screen.create_oval(mark.p.x - mark.r, mark.p.y - mark.r, mark.p.x + mark.r,
@@ -64,7 +64,7 @@ class AxialWorkspace:
         if self.in_box(p) and x and not self.checkForTooCloseNeightbors(p):
             color = cs.GREEN
             if x == AxialOrder.CENTRAL_POINT:
-                self.createGuideline(Line(Point(p.x, self.rect.top), Point(p.x, p.y), color=cs.RED))
+                self.createGuideline(Line(Point(p.x, self.rect.top), Point(p.x, p.y), color=cs.RED, dash=(4, 4)))
                 self.patient.axial.central_point = p
                 color = cs.RED
             elif x == AxialOrder.POINT_NOSE:
@@ -131,7 +131,6 @@ class AxialWorkspace:
         if completed_now:
             self.processFullPatient(self.patient)
         return completed_now
-
 
     def completeWorkspace(self, patient):
         self.addAngles(patient)

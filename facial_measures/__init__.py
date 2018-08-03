@@ -71,7 +71,7 @@ class AxialFace:
         def getLines(self, f, color=cs.BLACK, width=2):
             lines = []
             top = Point(f.central_point.x, 0)
-            vertical_line = geometry.Line(f.central_point, top, color=cs.RED, w=width)
+            vertical_line = geometry.Line(f.central_point, top, color=cs.RED, w=width, dash=(4,4))
             lines.append(vertical_line)
             break_line = geometry.Line(f.break_point, f.point_nose, color=cs.ORANGE, w=width)
             lines.append(break_line)

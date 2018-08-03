@@ -19,10 +19,11 @@ class Point:
 
 class Line:
 
-    def __init__(self, p1, p2, w = 2, color = cs.BLACK):
+    def __init__(self, p1, p2, w=2, color=cs.BLACK, dash=None):
         self.p1 = p1
         self.p2 = p2
         self.w = w
+        self.dash = dash
         self.color = color
         if p2.x - p1.x == 0:
             self.slope = 0

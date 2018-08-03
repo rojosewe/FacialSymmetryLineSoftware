@@ -15,6 +15,7 @@ from utils.Messages import messages as ms
 REF_WIDTH = 200
 REF_HEIGHT = 250
 
+
 class Reference:
 
     def __init__(self):
@@ -32,7 +33,6 @@ class Reference:
         self.img_obj = PhotoImage(self.img_obj)
         self.screen.create_image(self.rect.left, self.rect.top, image=self.img_obj, anchor="nw")
         self.next_point_label = next_point_label
-
 
     def get_image_size(self):
         return REF_WIDTH + 30, REF_HEIGHT
