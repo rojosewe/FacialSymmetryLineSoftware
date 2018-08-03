@@ -7,3 +7,5 @@ __pycache__/
 files/patients.db
 files/conf.json
 *.pyc
+files/old_dbs
+old_dbs/
