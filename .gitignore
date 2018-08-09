@@ -9,3 +9,4 @@ files/patients.json
 files/old_dbs/
 files/conf.json
 *.pyc
+files/axial.json

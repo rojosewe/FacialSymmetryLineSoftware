@@ -5,7 +5,7 @@ from geometry import Point
 
 
 class AxialFace:
-    
+
     def __init__(self):
         self.central_point = None
         self.break_point = None
@@ -23,7 +23,7 @@ class AxialFace:
             "wall_left": self.wall_left.get(),
             "wall_right": self.wall_right.get(),
         }
-        
+
     def fromDict(self, d):
         self.central_point = Point.from_array(d["central_point"])
         self.break_point = Point.from_array(d["break_point"])
@@ -38,7 +38,7 @@ class AxialFace:
     def get_proportions(self):
         self.proportions.calculate(self)
         return self.proportions
-        
+
     def __str__(self):
         d = self.toDict()
         for key in d:
@@ -53,7 +53,7 @@ class AxialFace:
             self.break_point_nose_point = None
             self.nose_point_wall_left = None
             self.nose_point_wall_right = None
-         
+
         def calculate(self, f):
             top = Point(f.central_point.x, 0)
             vertical_line = geometry.Line(f.central_point, top)
@@ -67,11 +67,11 @@ class AxialFace:
             self.nose_point_wall_left = geometry.angle(break_line, line)
             line = geometry.Line(f.wall_right, f.point_nose)
             self.nose_point_wall_right = geometry.angle(break_line, line)
-        
+
         def getLines(self, f, color=cs.BLACK, width=2):
             lines = []
             top = Point(f.central_point.x, 0)
-            vertical_line = geometry.Line(f.central_point, top, color=cs.RED, w=width, dash=(4,4))
+            vertical_line = geometry.Line(f.central_point, top, color=cs.RED, w=width, dash=(4, 4))
             lines.append(vertical_line)
             break_line = geometry.Line(f.break_point, f.point_nose, color=cs.ORANGE, w=width)
             lines.append(break_line)
@@ -87,7 +87,16 @@ class AxialFace:
 
         def __str__(self):
             return str(self.toDict())
-    
+
+        def toDict(self):
+            return {
+                "central_point_wall_left": self.central_point_wall_left,
+                "central_point_wall_right": self.central_point_wall_right,
+                "break_point_nose_point": self.break_point_nose_point,
+                "nose_point_wall_left": self.nose_point_wall_left,
+                "nose_point_wall_right": self.nose_point_wall_right
+            }
+
     class Proportions:
 
         def __init__(self):
@@ -100,16 +109,32 @@ class AxialFace:
             self.nose_point_wall = angles.nose_point_wall_left / angles.nose_point_wall_right
             self.break_point_nose_point = -1 if axial.point_nose.x > axial.break_point.x else 1
 
+        def toDict(self):
+            return {
+                "central_point_wall": self.central_point_wall,
+                "nose_point_wall": self.nose_point_wall,
+                "break_point_nose_point": self.break_point_nose_point
+            }
+
 
 class Patient:
-    
-    def __init__(self, name, age, gender, photo, axial=AxialFace()):
+
+    def __init__(self, name, age, gender, photo, axial=None):
         self.name = name
         self.age = age
         self.gender = gender
         self.photo = photo
-        self.axial = axial
-        
+        self.axial = axial or AxialFace()
+
+    def toDict(self):
+        return {
+            'name': self.name,
+            'age': self.age,
+            'gender': self.gender,
+            'photo': self.photo,
+            'axial': self.axial.toDict()
+        }
+
     def __str__(self):
         return """
         {'name': %s,g
@@ -117,9 +142,21 @@ class Patient:
         'gender': %s,
         'face': %s,
         'photo': %s,
-        'measurements': %s,
-        'angles': %s,
         'axial': %s
         }
-        """ % (self.name, self.age, self.gender, self.photo, str(self.face), str(self.measurements), str(self.angles),
-               self.axial)
+        """ % (self.name, self.age, self.gender, self.photo, self.axial)
+
+    def complete_dict(self):
+        self.calculate_proportions()
+        d = self.toDict()
+        d["axial"]
+        d["axial"]["angles"] = self.axial.angles.toDict()
+        d["axial"]["proportions"] = self.axial.proportions.toDict()
+        for key in list(d["axial"]["proportions"].keys()):
+            d["axial"]["proportions"][key + "_direction"] = "RIGHT" if d["axial"]["proportions"][key] > 0 else "LEFT"
+        return d
+
+    def calculate_proportions(self):
+        self.axial.angles.calculate(self.axial)
+        self.axial.proportions.calculate(self.axial, self.axial.angles)
+

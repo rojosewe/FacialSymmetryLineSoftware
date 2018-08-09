@@ -4,41 +4,60 @@ Created on May 14, 2017
 @author: root
 '''
 
-import os
+import csv
 
-columns = ["Nombre", "Edad", "Genero", "long_canto_interno_der", "long_canto_externo_der", "long_trago_der", 
-           "long_reborde_alar_der", "long_comisura_labial_der", "long_angulo_mandibular_der", 
-           "long_canto_interno_izq", "long_canto_externo_izq", "long_trago_izq", "long_reborde_alar_izq",
-           "long_comisura_labial_izq", "angulo_mandibular_izq", 
-           "ang_glabelar_canto_interno_der", "ang_glabelar_canto_externo_der", "ang_glabelar_trago_der", 
-           "ang_glabelar_reborde_alar_der", "ang_glabelar_comisura_labial_der", "ang_glabelar_angulo_mandibular_der", 
-           "ang_glabelar_canto_interno_izq", "ang_glabelar_canto_externo_izq", "ang_glabelar_trago_izq", 
-           "ang_glabelar_reborde_alar_izq", "ang_glabelar_comisura_labial_izq", "ang_glabelar_angulo_mandibular_izq",
-            "ang_pogonion_trago_der", "ang_pogonion_comisura_labial_der", "ang_pogonion_angulo_mandibular_der", 
-           "ang_pogonion_trago_izq", "ang_pogonion_comisura_labial_izq", "ang_pogonion_angulo_mandibular_izq",
-           "prop_longitud_canto_interno_I/D", "prop_longitud_canto_externo_I/D", "prop_longitud_trago_I/D", 
-           "prop_longitud_reborde_alar_I/D", "prop_longitud_comisura_labial_I/D", "prop_longitud_ang_mandibular_I/D", 
-           "prop_angulo_glabelar_canto_ext_I/D", "prop_angulo_glabelar_trago_I/D", "prop_angulo_glabelar_canto_int_I/D",  
-           "prop_angulo_glabelar_ang_mandibular_I/D", "prop_angulo_glabelar_reborde_alar_I/D", 
-           "prop_angulo_pogonion_ang_mandibular_I/D", "prop_angulo_pogonion_trago_I/D", 
-           "prop_angulo_pogonion_comisura_labial_I/D"
-           ]
+headers = ['name', 'age', 'gender', 'axial.central_point', 'axial.break_point', 'axial.point_nose',
+           'axial.wall_left', 'axial.wall_right', 'axial.angles.central_point_wall_left',
+           'axial.angles.central_point_wall_right', 'axial.angles.break_point_nose_point',
+           'axial.angles.nose_point_wall_left',
+           'axial.angles.nose_point_wall_right', 'axial.proportions.central_point_wall',
+           'axial.proportions.central_point_wall_direction',
+           'axial.proportions.nose_point_wall', 'axial.proportions.nose_point_wall_direction',
+           'axial.proportions.break_point_nose_point', 'axial.proportions.break_point_nose_point_direction']
+
+human_headers = {
+    'name': "Nombre",
+    'age': "Edad",
+    'gender': "Genero",
+    'axial.central_point': "punto septal posterior [x,y]",
+    'axial.break_point': "punto de quiebre [x,y]",
+    'axial.point_nose': "punta nasal [x,y]",
+    'axial.wall_left': "punto ducto naso-lagrimal izquierdo [x,y]",
+    'axial.wall_right': "punto ducto naso-lagrimal derecho [x,y]",
+    'axial.angles.central_point_wall_left': "angulo punto septal posterior - ducto naso-lagrimal izquierdo",
+    'axial.angles.central_point_wall_right': "angulo punto septal posterior - ducto naso-lagrimal derecho",
+    'axial.angles.nose_point_wall_left': "angulo punta nasal - ducto naso-lagrimal izquierdo",
+    'axial.angles.nose_point_wall_right': "angulo punta nasal - ducto naso-lagrimal derecho",
+    'axial.proportions.central_point_wall': "proporcion angulo punto septal posterior - ducto naso-lagrimal I/D",
+    'axial.proportions.central_point_wall_direction': "proporcion angulo punto septal posterior - ducto naso-lagrimal direccion",
+    'axial.proportions.nose_point_wall': "proporcion angulo punta nasal - ducto naso-lagrimal I/D",
+    'axial.proportions.nose_point_wall_direction': "proporcion angulo punta nasal - ducto naso-lagrimal direccion",
+    'axial.angles.break_point_nose_point': "angulo de punto de quiebre - punta nasal",
+    'axial.proportions.break_point_nose_point': "Direccion de desviacion angulo punto de quiebre - punta nasal: (1: Derecha, -1: Izquierda)",
+    'axial.proportions.break_point_nose_point_direction': "Direccion de desviacion angulo punto de quiebre - punta nasal"
+}
+
 
 def patientsToCSV(patients, file):
-    with open(file, mode='w+') as f:
-        f.write(",".join(columns) + "\n")
+    with open(file, mode='w+') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=headers, extrasaction='ignore')
+        writer.writerow(human_headers)
         for p in patients:
-            str = "'%s',%s,'%s',%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s%s" % (
-p.name, p.age, p.gender, p.measurements.internalCantL, p.measurements.externalCantL, p.measurements.tragoL, p.measurements.rebordeAlarL, 
-p.measurements.lipL, p.measurements.mandibleL, p.measurements.internalCantR, p.measurements.externalCantR, 
-p.measurements.tragoR, p.measurements.rebordeAlarR, p.measurements.lipR, p.measurements.mandibleR, 
-p.angles.angle3, p.angles.angle1, p.angles.angle2, p.angles.angle5, p.angles.angle6, p.angles.angle4, 
-p.angles.angle14, p.angles.angle15, p.angles.angle13, p.angles.angle17, p.angles.angle16, p.angles.angle18,
-p.angles.angle10, p.angles.angle12, p.angles.angle11, p.angles.angle8, p.angles.angle7, p.angles.angle9, 
-p.proportions.internalCantLength, p.proportions.externalCantLength, p.proportions.tragoLength, p.proportions.rebordeAlarLength,  
-p.proportions.lipLength, p.proportions.mandibleLength, 
-p.proportions.glabelarCantoExtAngle, p.proportions.glablearTragoAngle,
-p.proportions.glabelarCantoIntAngle, p.proportions.glablearMadibularAngle, p.proportions.glablearNasalAngle, 
-p.proportions.pogonionMandibularAngle, p.proportions.pogonionTragoAngle, p.proportions.pogonionLabialAngle, 
-os.linesep)
-            f.write(str)
+            csv_dict = extract_patient_flat_dict(p)
+            writer.writerow(csv_dict)
+
+
+def extract_patient_flat_dict(p):
+    base = p.complete_dict()
+    csv_dict = {}
+    for header in headers:
+        csv_dict[header] = get_value(base, header)
+    return csv_dict
+
+
+def get_value(d, header):
+    final_value = None
+    for key in header.split("."):
+        final_value = d[key]
+        d = d[key]
+    return d
