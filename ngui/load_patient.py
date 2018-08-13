@@ -19,16 +19,20 @@ def select_patient():
 
 
 def _open_patient(name):
+    patient = JsonLoader.getPatient(name)
+    set_patient(patient)
+    _aux_open(patient)
+
+
+def _aux_open(patient):
     try:
-        patient = JsonLoader.getPatient(name)
-        set_patient(patient)
         AxialOrder.marked_order_as_completed(patient)
         patient_manager = AxialPatientManager()
         return patient_manager.load()
     except FileNotFoundError:
         gui.msgbox(ms["error_on_img"].format(patient.photo))
         patient.photo = _load_select_image()
-        _open_patient(name)
+        _aux_open(patient)
 
 
 def _load_select_image():
