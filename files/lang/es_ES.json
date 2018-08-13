@@ -79,5 +79,8 @@
   "break_point": "punto de quiebre",
   "angle": "Angulo",
   "deviation": "Desviacion",
-  "next_point": "Proximo punto"
+  "next_point": "Proximo punto",
+  "maxilars": "maxilares",
+  "maxilar_left": "maxilar izquierdo",
+  "maxilar_right": "maxilar derecho"
 }

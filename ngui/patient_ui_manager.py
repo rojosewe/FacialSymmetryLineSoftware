@@ -29,6 +29,7 @@ class PatientManager:
         self.workspace.load_screen(screen, 0, 0, ww, wh)
         screen.bind("<Button-1>", self.mouse_up)
         screen.bind("<Motion>", self.mouse_move)
+        refscreen.bind("<Button-1>", self.print_ref_point)
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.root.title("Facial Symmetry Analysis")
         tk.mainloop()
@@ -55,6 +56,10 @@ class PatientManager:
         self.reference.process_click()
         if completed:
             JsonLoader.savePatient()
+
+    def print_ref_point(self, event):
+        p = self.get_point(event)
+        print(p)
 
     def on_closing(self):
         if not AxialOrder.is_completed():

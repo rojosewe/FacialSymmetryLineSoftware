@@ -12,6 +12,8 @@ class AxialFace:
         self.point_nose = None
         self.wall_left = None
         self.wall_right = None
+        self.maxilar_left = None
+        self.maxilar_right = None
         self.angles = self.Angles()
         self.proportions = self.Proportions()
 
@@ -22,6 +24,8 @@ class AxialFace:
             "point_nose": self.point_nose.get(),
             "wall_left": self.wall_left.get(),
             "wall_right": self.wall_right.get(),
+            "maxilar_left": self.maxilar_left.get(),
+            "maxilar_right": self.maxilar_right.get(),
         }
 
     def fromDict(self, d):
@@ -30,6 +34,8 @@ class AxialFace:
         self.point_nose = Point.from_array(d["point_nose"])
         self.wall_left = Point.from_array(d["wall_left"])
         self.wall_right = Point.from_array(d["wall_right"])
+        self.maxilar_left = Point.from_array(d["maxilar_left"])
+        self.maxilar_right = Point.from_array(d["maxilar_right"])
 
     def get_angles(self):
         self.angles.calculate(self)
@@ -53,6 +59,9 @@ class AxialFace:
             self.break_point_nose_point = None
             self.nose_point_wall_left = None
             self.nose_point_wall_right = None
+            self.nose_point_maxilar_left = None
+            self.nose_point_maxilar_right = None
+
 
         def calculate(self, f):
             top = Point(f.central_point.x, 0)
@@ -67,6 +76,10 @@ class AxialFace:
             self.nose_point_wall_left = geometry.angle(break_line, line)
             line = geometry.Line(f.wall_right, f.point_nose)
             self.nose_point_wall_right = geometry.angle(break_line, line)
+            line = geometry.Line(f.maxilar_left, f.point_nose)
+            self.nose_point_maxilar_left = geometry.angle(break_line, line)
+            line = geometry.Line(f.maxilar_right, f.point_nose)
+            self.nose_point_maxilar_right = geometry.angle(break_line, line)
 
         def getLines(self, f, color=cs.BLACK, width=2):
             lines = []
@@ -83,6 +96,10 @@ class AxialFace:
             lines.append(line)
             line = geometry.Line(f.point_nose, f.wall_right, color=cs.GREEN, w=width)
             lines.append(line)
+            line = geometry.Line(f.maxilar_left, f.point_nose, color=cs.YELLOW, w=width)
+            lines.append(line)
+            line = geometry.Line(f.maxilar_right, f.point_nose, color=cs.YELLOW, w=width)
+            lines.append(line)
             return lines
 
         def __str__(self):
@@ -94,7 +111,9 @@ class AxialFace:
                 "central_point_wall_right": self.central_point_wall_right,
                 "break_point_nose_point": self.break_point_nose_point,
                 "nose_point_wall_left": self.nose_point_wall_left,
-                "nose_point_wall_right": self.nose_point_wall_right
+                "nose_point_wall_right": self.nose_point_wall_right,
+                "nose_point_maxilar_left": self.nose_point_maxilar_left,
+                "nose_point_maxilar_right": self.nose_point_maxilar_right
             }
 
     class Proportions:
@@ -107,13 +126,15 @@ class AxialFace:
         def calculate(self, axial, angles):
             self.central_point_wall = angles.central_point_wall_left / angles.central_point_wall_right
             self.nose_point_wall = angles.nose_point_wall_left / angles.nose_point_wall_right
+            self.nose_point_maxilar = angles.nose_point_maxilar_left / angles.nose_point_maxilar_right
             self.break_point_nose_point = -1 if axial.point_nose.x > axial.break_point.x else 1
 
         def toDict(self):
             return {
                 "central_point_wall": self.central_point_wall,
                 "nose_point_wall": self.nose_point_wall,
-                "break_point_nose_point": self.break_point_nose_point
+                "break_point_nose_point": self.break_point_nose_point,
+                "nose_point_maxilar": self.nose_point_maxilar
             }
 
 

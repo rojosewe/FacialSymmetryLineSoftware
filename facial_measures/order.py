@@ -52,8 +52,10 @@ class AxialOrder(Order):
     BREAK_POINT = "BREAK POINT"
     WALL_LEFT = "LEFT NASAL WALL"
     WALL_RIGHT = "RIGHT NASAL WALL"
+    MAXILAR_LEFT = "MAXILAR LEFT"
+    MAXILAR_RIGHT = "MAXILAR RIGHT"
 
-    order = [CENTRAL_POINT, BREAK_POINT, WALL_RIGHT, WALL_LEFT, POINT_NOSE]
+    order = [CENTRAL_POINT, BREAK_POINT, WALL_RIGHT, WALL_LEFT, MAXILAR_RIGHT, MAXILAR_LEFT, POINT_NOSE]
 
     to_process = order.copy()
     processed = []
@@ -66,7 +68,9 @@ class AxialOrder(Order):
             cls.BREAK_POINT: axial.break_point,
             cls.POINT_NOSE: axial.point_nose,
             cls.WALL_LEFT: axial.wall_left,
-            cls.WALL_RIGHT: axial.wall_right
+            cls.WALL_RIGHT: axial.wall_right,
+            cls.MAXILAR_RIGHT: axial.maxilar_right,
+            cls.MAXILAR_LEFT: axial.maxilar_left
         }
 
     @classmethod

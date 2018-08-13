@@ -58,9 +58,12 @@ def getPatient(name):
     patients = loadPatients()
     patient_dict = patients[tokey(name)]
     patient = Patient(patient_dict["name"], patient_dict["age"], patient_dict["gender"], patient_dict["photo"])
-    patient.axial.fromDict(patient_dict.get("axial", None))
-    patient.axial.angles.calculate(patient.axial)
-    patient.axial.proportions.calculate(patient.axial, patient.axial.angles)
+    try:
+        patient.axial.fromDict(patient_dict.get("axial", None))
+        patient.axial.angles.calculate(patient.axial)
+        patient.axial.proportions.calculate(patient.axial, patient.axial.angles)
+    except KeyError:
+        pass
     return patient
 
 

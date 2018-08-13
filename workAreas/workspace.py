@@ -77,6 +77,12 @@ class AxialWorkspace:
                 self.patient.axial.wall_left = p
             elif x == AxialOrder.WALL_RIGHT:
                 self.patient.axial.wall_right = p
+            elif x == AxialOrder.MAXILAR_LEFT:
+                self.patient.axial.maxilar_left = p
+                color = cs.YELLOW
+            elif x == AxialOrder.MAXILAR_RIGHT:
+                self.patient.axial.maxilar_right = p
+                color = cs.YELLOW
             AxialOrder.add_to_processed(x)
             if not AxialOrder.is_empty():
                 self._auxAddMark(p, r=6, color=color)
@@ -112,6 +118,8 @@ class AxialWorkspace:
             self._auxAddMark(patient.axial.point_nose, 6, cs.YELLOW)
             self._auxAddMark(patient.axial.wall_left, 6)
             self._auxAddMark(patient.axial.wall_right, 6)
+            self._auxAddMark(patient.axial.maxilar_left, 6, cs.YELLOW)
+            self._auxAddMark(patient.axial.maxilar_right, 6, cs.YELLOW)
             self.processFullPatient(patient)
 
     def _auxAddMark(self, p, r=6, color=cs.GREEN):

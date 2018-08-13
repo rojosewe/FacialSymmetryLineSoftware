@@ -35,6 +35,10 @@ class AxialProportions:
                   values=(self.getAngle(self.a.nose_point_wall_left), self.getAngle(self.a.nose_point_wall_right),
                           self.getDifferential(self.p.nose_point_wall),
                           self.getOrientation(self.p.nose_point_wall)))
+        tm.insert("", 0, text="{maxilars} - {nose_point}".format_map(ms),
+                  values=(self.getAngle(self.a.nose_point_maxilar_left), self.getAngle(self.a.nose_point_maxilar_right),
+                          self.getDifferential(self.p.nose_point_maxilar),
+                          self.getOrientation(self.p.nose_point_maxilar)))
         tm.grid()
 
     def addBreakingPointTable(self, tableFrame):
