@@ -20,7 +20,7 @@ class AxialProportions:
     def addAngleTable(self, tableFrame):
         angle_label = tk.Label(tableFrame, text=ms.get("angles"))
         angle_label.grid(sticky=tk.W, padx=10)
-        tm = Treeview(tableFrame, height=2)
+        tm = Treeview(tableFrame, height=3)
         tm["columns"] = "left", "right", "differential", "orientation"
         tm.heading("left", text=ms.get("right"))
         tm.heading("right", text=ms.get("left"))
