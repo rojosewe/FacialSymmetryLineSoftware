@@ -73,7 +73,8 @@ def savePatient(backup=True):
     patients = loadPatients()
     patients[tokey(patient_dict["name"])] = patient_dict
     if backup and os.path.isfile(axial_json_filepath):
-        bkup_file = os.path.join(old_dbs_path, "axial_patients" + "_" + str(datetime.datetime.now()) + ".json")
+        str_date = datetime.datetime.now().strftime('%Y_%m_%d_%H_%M')
+        bkup_file = os.path.join(old_dbs_path, "axial_patients" + "_" + str_date + ".json")
         copyfile(axial_json_filepath, bkup_file)
     with open(axial_json_filepath, "w+") as f:
         json.dump(patients, f)

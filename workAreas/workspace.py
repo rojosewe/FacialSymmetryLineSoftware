@@ -15,6 +15,7 @@ from facial_measures.order import AxialOrder
 
 MIN_DIST = 20
 MAX_V = 700
+MAX_H = 900
 
 
 class AxialWorkspace:
@@ -36,6 +37,9 @@ class AxialWorkspace:
         proportion = w/h
         h = min(MAX_V, h)
         w = int(h * proportion)
+        if w > MAX_H:
+            w = MAX_H
+            h = int(w // proportion)
         return w, h
     
     def load_screen(self, screen, left, top, right, bottom):
