@@ -68,7 +68,7 @@ class AxialWorkspace:
         if self.in_box(p) and x and not self.checkForTooCloseNeightbors(p):
             color = cs.GREEN
             if x == AxialOrder.CENTRAL_POINT:
-                self.createGuideline(Line(Point(p.x, self.rect.top), Point(p.x, p.y), color=cs.RED, dash=(4, 4)))
+                self.createGuideline(Line(Point(p.x, self.rect.top), Point(p.x, p.y), color=cs.RED, w=3, dash=(4, 4)))
                 self.patient.axial.central_point = p
                 color = cs.RED
             elif x == AxialOrder.POINT_NOSE:
@@ -89,7 +89,7 @@ class AxialWorkspace:
                 color = cs.YELLOW
             AxialOrder.add_to_processed(x)
             if not AxialOrder.is_empty():
-                self._auxAddMark(p, r=6, color=color)
+                self._auxAddMark(p, r=8, color=color)
         complete_now = AxialOrder.is_completed()
         if complete_now and not complete_before:
             return True
@@ -117,13 +117,13 @@ class AxialWorkspace:
 
     def complete_visuals_if_patient_is_completed(self, patient):
         if AxialOrder.is_completed():
-            self._auxAddMark(patient.axial.central_point, 6, cs.RED)
-            self._auxAddMark(patient.axial.break_point, 6, cs.BLUE)
-            self._auxAddMark(patient.axial.point_nose, 6, cs.YELLOW)
-            self._auxAddMark(patient.axial.wall_left, 6)
-            self._auxAddMark(patient.axial.wall_right, 6)
-            self._auxAddMark(patient.axial.maxilar_left, 6, cs.YELLOW)
-            self._auxAddMark(patient.axial.maxilar_right, 6, cs.YELLOW)
+            self._auxAddMark(patient.axial.central_point, 8, cs.RED)
+            self._auxAddMark(patient.axial.break_point, 8, cs.BLUE)
+            self._auxAddMark(patient.axial.point_nose, 8, cs.YELLOW)
+            self._auxAddMark(patient.axial.wall_left, 8)
+            self._auxAddMark(patient.axial.wall_right, 8)
+            self._auxAddMark(patient.axial.maxilar_left, 8, cs.YELLOW)
+            self._auxAddMark(patient.axial.maxilar_right, 8, cs.YELLOW)
             self.processFullPatient(patient)
 
     def _auxAddMark(self, p, r=6, color=cs.GREEN):
