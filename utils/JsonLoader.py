@@ -1,44 +1,31 @@
 import json
-from utils import Loader
 import os
 from base64 import b64encode, b64decode
 from facial_measures import Patient
-from shutil import copyfile, move
+from shutil import copyfile
 import datetime
 from workAreas.state_manager import get_patient
 
-axial_json_filepath = os.path.join("files", "axial.json")
+db_json_filepath = os.path.join("files", "patients_db.json")
 json_filepath = os.path.join("files", "patients.json")
 json_filepath_name = os.path.join("files", "patients")
 old_dbs_path = os.path.join("files", "old_dbs")
 old_old_dbs_path = "old_dbs"
 
 
-def migrateDB():
-    dbpath = os.path.join("files", "patients.db")
-    if os.path.exists(old_old_dbs_path):
-        move(old_old_dbs_path, old_dbs_path)
-    if not os.path.exists(old_dbs_path):
-        os.makedirs(old_dbs_path)
-    if os.path.isfile(dbpath):
-        for patient in Loader.getAllPatients():
-            savePatient(patient, False)
-        if os.path.isfile(dbpath):
-            move(dbpath, os.path.join(old_dbs_path, "patients_old.db"))
-
-
-def patientToJson(patient):
-    patientinfo = {
+def patient_to_json(patient):
+    patient_info = {
+        "key": patient.name + " - " + patient.type,
         "name": patient.name,
         "age": patient.age,
         "gender": patient.gender,
         "photo": patient.photo,
-        "axial": patient.axial.toDict()
+        "values": patient.values.to_dict()
     }
-    return patientinfo
+    return patient_info
 
 
-def loadPatients(filepath=axial_json_filepath):
+def load_patients(filepath=db_json_filepath):
     if os.path.isfile(filepath):
         with open(filepath, "r+") as f:
             return json.load(f)
@@ -46,41 +33,43 @@ def loadPatients(filepath=axial_json_filepath):
         return {}
 
 
-def getAllPatientsNames():
-    return [fromkey(key) for key in loadPatients().keys()]
+def get_all_patients_names():
+    return [from_key(key) for key in load_patients().keys()].sort()
 
 
-def getAllPatients():
-    return [getPatient(fromkey(key)) for key in loadPatients().keys()]
+def get_all_patients():
+    return [get_patient(from_key(key)) for key in load_patients().keys()]
 
 
-def getPatient(name):
-    patients = loadPatients()
-    patient_dict = patients[tokey(name)]
+def get_patient(name):
+    patients = load_patients()
+    patient_dict = patients[to_key(name)]
     patient = Patient(patient_dict["name"], patient_dict["age"], patient_dict["gender"], patient_dict["photo"])
     try:
-        patient.axial.fromDict(patient_dict.get("axial", None))
-        patient.axial.angles.calculate(patient.axial)
-        patient.axial.proportions.calculate(patient.axial, patient.axial.angles)
+        patient.values.from_dict(patient_dict.get("values", None))
+        patient.values.angles.calculate(patient.values)
+        patient.values.proportions.calculate(patient.values, patient.values.angles)
     except KeyError:
         pass
     return patient
 
 
-def savePatient(backup=True):
+def save_patient(backup=True):
     patient = get_patient()
-    patient_dict = patientToJson(patient)
-    patients = loadPatients()
-    patients[tokey(patient_dict["name"])] = patient_dict
-    if backup and os.path.isfile(axial_json_filepath):
+    patient_dict = patient_to_json(patient)
+    patients = load_patients()
+    patients[to_key(patient_dict["key"])] = patient_dict
+    if backup and os.path.isfile(db_json_filepath):
         str_date = datetime.datetime.now().strftime('%Y_%m_%d_%H_%M')
-        bkup_file = os.path.join(old_dbs_path, "axial_patients" + "_" + str_date + ".json")
-        copyfile(axial_json_filepath, bkup_file)
-    with open(axial_json_filepath, "w+") as f:
+        bkup_file = os.path.join(old_dbs_path, "patients" + "_" + str_date + ".json")
+        copyfile(db_json_filepath, bkup_file)
+    with open(db_json_filepath, "w+") as f:
         json.dump(patients, f)
 
-def tokey(name):
+
+def to_key(name):
     return b64encode(bytes(name, 'utf-8')).decode("utf-8")
 
-def fromkey(key):
+
+def from_key(key):
     return b64decode(key).decode("utf-8")

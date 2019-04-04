@@ -1,8 +1,9 @@
 from geometry import Point
-from workAreas.reference import AxialReference
-from workAreas.workspace import AxialWorkspace
-from facial_measures.order import AxialOrder
-from workAreas.proportions_table import AxialProportions
+from workAreas.reference.axial import AxialReference
+from workAreas.reference.frontal import FrontalReference
+from workAreas.workspace import AxialWorkspace, FrontalWorkspace
+from facial_measures.order import AxialOrder, FrontalOrder
+from workAreas.proportions_table import AxialProportions, FrontalProportions
 from utils.Messages import messages as ms
 from utils import JsonLoader
 import tkinter as tk
@@ -34,6 +35,18 @@ class PatientManager:
         self.root.title("Facial Symmetry Analysis")
         tk.mainloop()
 
+    def load_ui_wokspace(self, embed, root, wh, ww):
+        deleteBtn = tk.Button(embed, text=ms["delete_last"], command=self.delete_mark, width=15)
+        propsBtn = tk.Button(embed, text=ms["show_props"], command=self.show_proportions, width=15)
+        clearBtn = tk.Button(embed, text=ms["delete_all"], command=self.delete_all, width=15)
+        screen = tk.Canvas(root, width=ww, height=wh)
+        screen.grid(row=0, column=1, sticky=tk.W + tk.N)
+        propsBtn.grid(sticky=tk.W, padx=6)
+        deleteBtn.grid(sticky=tk.W, padx=6)
+        clearBtn.grid(sticky=tk.W + tk.S, pady=35, padx=6)
+        screen.grid(sticky=tk.W)
+        return screen
+
     def get_point(self, event):
         p = (event.x, event.y)
         return Point(p[0], p[1])
@@ -48,21 +61,21 @@ class PatientManager:
 
     def mouse_move(self, event):
         p = self.get_point(event)
-        self.workspace.processMove(p)
+        self.workspace.process_move(p)
 
     def mouse_up(self, event):
         p = self.get_point(event)
         completed = self.workspace.process_click_return_if_completed(event, p)
         self.reference.process_click()
         if completed:
-            JsonLoader.savePatient()
+            JsonLoader.save_patient()
 
     def print_ref_point(self, event):
         p = self.get_point(event)
         print(p)
 
     def on_closing(self):
-        if not AxialOrder.is_completed():
+        if not self.order.is_completed():
             if gui.boolbox(ms["on_close"], ms["exit"], [ms["yes"], ms["no"]]):
                 self.workspace.restart()
                 self.root.destroy()
@@ -79,19 +92,21 @@ class AxialPatientManager(PatientManager):
         self.root = tk.Tk()
         self.reference = AxialReference()
         self.workspace = AxialWorkspace()
-
-    def load_ui_wokspace(self, embed, root, wh, ww):
-        deleteBtn = tk.Button(embed, text=ms["delete_last"], command=self.delete_mark, width=15)
-        propsBtn = tk.Button(embed, text=ms["show_props"], command=self.show_proportions, width=15)
-        clearBtn = tk.Button(embed, text=ms["delete_all"], command=self.delete_all, width=15)
-        screen = tk.Canvas(root, width=ww, height=wh)
-        screen.grid(row=0, column=1, sticky=tk.W + tk.N)
-        propsBtn.grid(sticky=tk.W, padx=6)
-        deleteBtn.grid(sticky=tk.W, padx=6)
-        clearBtn.grid(sticky=tk.W + tk.S, pady=35, padx=6)
-        screen.grid(sticky=tk.W)
-        return screen
+        self.order = AxialOrder
 
     def show_proportions(self):
         toplevel = tk.Toplevel()
-        AxialProportions().showProportions(toplevel, AxialOrder.is_completed())
+        AxialProportions().showProportions(toplevel, self.order.is_completed())
+
+
+class FrontalPatientManager(PatientManager):
+
+    def __init__(self):
+        self.root = tk.Tk()
+        self.reference = FrontalReference()
+        self.workspace = FrontalWorkspace()
+        self.order = FrontalOrder
+
+    def show_proportions(self):
+        toplevel = tk.Toplevel()
+        FrontalProportions().showProportions(toplevel, self.order.is_completed())

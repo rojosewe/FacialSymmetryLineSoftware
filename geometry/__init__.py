@@ -73,8 +73,10 @@ def intersects(line1, line2):
     else:
         return None
     
+
 def dot(vA, vB):
     return vA[0]*vB[0]+vA[1]*vB[1]
+
 
 def angle(lineA, lineB):
     # Get nicer vector form
@@ -97,3 +99,102 @@ def angle(lineA, lineB):
         return 360 - ang_deg
     else: 
         return ang_deg
+
+
+class SymmetryPoint:
+
+    def __init__(self):
+        self.left = None
+        self.right = None
+
+    def get_right(self):
+        self.__get_point(self.right)
+
+    def get_left(self):
+        self.__get_point(self.left)
+
+    def __get_point(self, point):
+        if point:
+            return point.get()
+        else:
+            return None
+
+
+class SymmetryAngle:
+
+    def __init__(self, symmetry_point, reference_point_main, reference_point_2):
+        self.reference_point_main = reference_point_main
+        self.symmetry_point = symmetry_point
+        self.reference_line = Line(reference_point_main, reference_point_2)
+        self.left_line = self.get_left_line()
+        self.right_line = self.get_right_line()
+        self.left_angle = angle(self.reference_line, self.left_line)
+        self.right_angle = angle(self.reference_line, self.right_line)
+        self.proportion = self.left_angle / self.right_angle
+
+    def get_angles(self):
+        return self.left_angle, self.right_angle
+
+    def get_proportion(self):
+        return self.proportion
+
+    def get_lines(self, color=cs.BLACK, width=2):
+        return self.get_left_line(color, width), self.get_right_line(color, width)
+
+    def get_left_line(self, color=cs.BLACK, width=2):
+        return Line(self.reference_point_main, self.symmetry_point.left, color=color, w=width)
+
+    def get_right_line(self, color=cs.BLACK, width=2):
+        return Line(self.reference_point_main, self.symmetry_point.right, color=color, w=width)
+
+
+class SymmetryDisjointAngle:
+
+    def __init__(self, symmetry_point_left_1, symmetry_point_left_2,
+                 reference_point_left_1, reference_point_left_2,
+                 symmetry_point_right_1, symmetry_point_right_2,
+                 reference_point_right_1, reference_point_right_2):
+        self.reference_line_left = Line(reference_point_left_1, reference_point_left_2)
+        self.reference_line_right = Line(reference_point_right_1, reference_point_right_2)
+        self.left_line = Line(symmetry_point_left_1, symmetry_point_left_2)
+        self.right_line = Line(symmetry_point_right_1, symmetry_point_right_2)
+        self.left_angle = angle(self.reference_line_left, self.left_line)
+        self.right_angle = angle(self.reference_line_right, self.right_line)
+        self.proportion = self.left_angle / self.right_angle
+
+    def get_angles(self):
+        return self.left_angle, self.right_angle
+
+    def get_proportion(self):
+        return self.proportion
+
+    def get_lines(self, color=cs.BLACK, width=2):
+        return self.get_left_line(color, width), self.get_right_line(color, width)
+
+    def get_left_line(self, color=cs.BLACK, width=2):
+        return Line(self.symmetry_point_left_1, self.symmetry_point_left_2, color=color, w=width)
+
+    def get_right_line(self, color=cs.BLACK, width=2):
+        return Line(self.symmetry_point_right_2, self.symmetry_point_right_2, color=color, w=width)
+
+
+class DisplacementAngle:
+
+    def __init__(self, main_point_1, main_point_2, reference_line):
+        self.main_point_1 = main_point_1
+        self.main_point_2 = main_point_2
+        self.reference_line = reference_line
+        self.main_line = self.get_line()
+        self.main_angle = angle(self.reference_line, self.main_line)
+
+    def get_displacement_x(self):
+        return self.main_point_1.x - self.main_point_2.x
+
+    def get_displacement_y(self):
+        return self.main_point_1.y - self.main_point_2.y
+
+    def get_angle(self):
+        return self.main_angle
+
+    def get_line(self, color=cs.BLACK, width=2):
+        return Line(self.main_point_1, self.main_point_2, color=color, w=width)

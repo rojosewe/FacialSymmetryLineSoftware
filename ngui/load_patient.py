@@ -1,16 +1,16 @@
 from utils import JsonLoader
-from ngui.patient_ui_manager import AxialPatientManager
+from ngui.patient_ui_manager import AxialPatientManager, FrontalPatientManager
 import easygui as gui
 from utils.Messages import messages as ms
 from utils.conf import Conf as cf
 from workAreas.state_manager import set_patient
-from facial_measures.order import AxialOrder
+from facial_measures.order import AxialOrder, FrontalOrder
 
 
 def select_patient():
     msg = ms["select_patient"]
     title = ms["patients"]
-    choices = JsonLoader.getAllPatientsNames()
+    choices = JsonLoader.get_all_patients_names()
     choice = gui.choicebox(msg, title, choices)
     if choice is None:
         return None
@@ -19,15 +19,19 @@ def select_patient():
 
 
 def _open_patient(name):
-    patient = JsonLoader.getPatient(name)
+    patient = JsonLoader.get_patient(name)
     set_patient(patient)
     _aux_open(patient)
 
 
 def _aux_open(patient):
     try:
-        AxialOrder.marked_order_as_completed(patient)
-        patient_manager = AxialPatientManager()
+        if patient.is_axial_patient():
+            AxialOrder.marked_order_as_completed(patient)
+            patient_manager = AxialPatientManager()
+        else:
+            FrontalOrder.marked_order_as_completed(patient)
+            patient_manager = FrontalPatientManager()
         return patient_manager.load()
     except FileNotFoundError:
         gui.msgbox(ms["error_on_img"].format(patient.photo))
