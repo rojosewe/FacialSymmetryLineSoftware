@@ -32,7 +32,7 @@ class Workspace:
 
     def get_image_size(self):
         w, h = self.pil_img.size
-        proportion = w/h
+        proportion = w / h
         h = min(MAX_V, h)
         w = int(h * proportion)
         if w > MAX_H:
@@ -50,16 +50,15 @@ class Workspace:
         self.complete_visuals_if_patient_is_completed(self.patient)
 
     def in_box(self, p):
-        return p.x >= self.rect.left and p.x < self.rect.right \
-               and p.y >= self.rect.top and p.y < self.rect.bottom
+        return p.x >= self.rect.left and p.x < self.rect.right and p.y >= self.rect.top and p.y < self.rect.bottom
 
     def create_line(self, line):
-        return self.screen.create_line(line.p1.x, line.p1.y,line.p2.x, line.p2.y,
+        return self.screen.create_line(line.p1.x, line.p1.y, line.p2.x, line.p2.y,
                                        fill=line.color, width=line.w, dash=line.dash)
 
     def create_mark(self, mark):
         return self.screen.create_oval(mark.p.x - mark.r, mark.p.y - mark.r, mark.p.x + mark.r,
-                                  mark.p.y + mark.r, fill=mark.color)
+                                       mark.p.y + mark.r, fill=mark.color)
 
     def _check_for_too_close_neighbors(self, p):
         for p1 in self.pixel_points:
@@ -73,8 +72,9 @@ class Workspace:
         else:
             return True
 
-    def create_guideline(self, line):
-        self.guideline = self.create_line(line)
+    def create_guideline(self, p):
+        self.guideline = self.create_line(Line(Point(p.x, self.rect.top), Point(p.x, self.rect.bottom),
+                                               color=cs.RED, w=3, dash=(4, 4)))
 
     def remove_guideline(self):
         self.screen.delete(self.guideline)
@@ -98,11 +98,11 @@ class Workspace:
             self.screen.delete(line)
 
     def clean(self):
+        self.remove_guideline()
         self._delete_all_marks()
         self._delete_all_lines()
         self.order.delete_all_processed()
-        self.remove_guideline()
-        self.patient.values = AxialFace()
+        self.reset_instance()
 
     def _delete_all_marks(self):
         for i in range(len(self.green_marks)):
@@ -124,7 +124,7 @@ class Workspace:
         self.screen.delete(m)
 
     def addAngles(self, patient):
-        lines = patient.values.angles.get_lines(patient.values, color=cs.BLUE, width=4)
+        lines = patient.values.angles.get_lines(patient.values, color=cs.GREEN, width=3)
         for line in lines:
             self.lines.append(self.create_line(line))
 
@@ -135,10 +135,13 @@ class Workspace:
         return completed_now
 
     def process_full_patient(self, patient):
+        patient.values.calculate_additional()
         patient.values.angles.calculate(patient.values)
-        patient.values.proportions = patient.values.get_proportions()
         self.completeWorkspace(patient)
         return patient
+
+    def reset_instance(self):
+        pass
 
 
 class AxialWorkspace(Workspace):
@@ -156,8 +159,8 @@ class AxialWorkspace(Workspace):
         if self.in_box(p) and x and not self._check_for_too_close_neighbors(p):
             color = cs.GREEN
             if x == AxialOrder.CENTRAL_POINT:
-                self.create_guideline(Line(Point(p.x, self.rect.top), Point(p.x, p.y), color=cs.RED, w=3, dash=(4, 4)))
                 self.patient.values.central_point = p
+                self.create_guideline(p)
                 color = cs.RED
             elif x == AxialOrder.POINT_NOSE:
                 self.patient.values.point_nose = p
@@ -188,12 +191,15 @@ class AxialWorkspace(Workspace):
         if self.order.is_completed():
             self._auxAddMark(patient.values.central_point, 8, cs.RED)
             self._auxAddMark(patient.values.break_point, 8, cs.BLUE)
-            self._auxAddMark(patient.values.point_nose, 8, cs.YELLOW)
             self._auxAddMark(patient.values.wall.left, 8)
             self._auxAddMark(patient.values.wall.right, 8)
             self._auxAddMark(patient.values.maxilar.left, 8, cs.YELLOW)
             self._auxAddMark(patient.values.maxilar.right, 8, cs.YELLOW)
+            self._auxAddMark(patient.values.point_nose, 8, cs.YELLOW)
             self.process_full_patient(patient)
+
+    def reset_instance(self):
+        self.patient.values = AxialFace()
 
 
 class FrontalWorkspace(Workspace):
@@ -211,43 +217,55 @@ class FrontalWorkspace(Workspace):
         if self.in_box(p) and x and not self._check_for_too_close_neighbors(p):
             color = cs.GREEN
             if x == FrontalOrder.HORIZONTAL_LINE:
-                self.create_guideline(Line(Point(p.x, self.rect.top), Point(p.x, self.rect.bottom),
-                                           color=cs.RED, w=3, dash=(4, 4)))
-                self.patient.values
-            elif x == FrontalOrder.TOP_HEAD:
-                self.patient.values.upper = p
+                self.patient.values.guideline_point = p
+                self.create_guideline(p)
             elif x == FrontalOrder.CHIN:
+                color = cs.RED
                 self.patient.values.chin = p
             elif x == FrontalOrder.FOREHEAD:
+                color = cs.BLUE
                 self.patient.values.middle = p
             elif x == FrontalOrder.EYE_OUTER_LEFT:
+                color = cs.BLUE
                 self.patient.values.outer_eye.left = p
             elif x == FrontalOrder.EYE_OUTER_RIGHT:
+                color = cs.BLUE
                 self.patient.values.outer_eye.right = p
             elif x == FrontalOrder.EYE_INNER_LEFT:
+                color = cs.BLUE
                 self.patient.values.inner_eye.left = p
             elif x == FrontalOrder.EYE_INNER_RIGHT:
+                color = cs.BLUE
                 self.patient.values.inner_eye.right = p
             elif x == FrontalOrder.CHEEKBONE_LEFT:
+                color = cs.GREEN
                 self.patient.values.cheekbone.left = p
             elif x == FrontalOrder.CHEEKBONE_RIGHT:
+                color = cs.GREEN
                 self.patient.values.cheekbone.right = p
             elif x == FrontalOrder.NOSE_LEFT:
+                color = cs.GREEN
                 self.patient.values.nose.left = p
             elif x == FrontalOrder.NOSE_CENTER:
+                color = cs.GREEN
                 self.patient.values.nose_center = p
             elif x == FrontalOrder.NOSE_RIGHT:
+                color = cs.GREEN
                 self.patient.values.nose.right = p
             elif x == FrontalOrder.MOUTH_LEFT:
+                color = cs.ORANGE
                 self.patient.values.mouth.left = p
             elif x == FrontalOrder.MOUTH_RIGHT:
+                color = cs.ORANGE
                 self.patient.values.mouth.right = p
             elif x == FrontalOrder.CHEEK_LEFT:
+                color = cs.ORANGE
                 self.patient.values.cheek.left = p
             elif x == FrontalOrder.CHEEK_RIGHT:
+                color = cs.ORANGE
                 self.patient.values.cheek.right = p
             FrontalOrder.add_to_processed(x)
-            if not FrontalOrder.is_empty():
+            if not FrontalOrder.is_empty() and x != FrontalOrder.HORIZONTAL_LINE:
                 self._auxAddMark(p, r=8, color=color)
         complete_now = self.order.is_completed()
         if complete_now and not complete_before:
@@ -257,13 +275,14 @@ class FrontalWorkspace(Workspace):
 
     def complete_visuals_if_patient_is_completed(self, patient):
         if self.order.is_completed():
-            self._auxAddMark(patient.values.upper, 8, cs.RED)
+            self.remove_guideline()
+            self.create_guideline(self.patient.values.guideline_point)
             self._auxAddMark(patient.values.chin, 8, cs.RED)
             self._auxAddMark(patient.values.middle, 8, cs.BLUE)
-            self._auxAddMark(patient.values.outer_eye.left, 8, cs.YELLOW)
-            self._auxAddMark(patient.values.outer_eye.left, 8, cs.YELLOW)
-            self._auxAddMark(patient.values.inner_eye.left, 8, cs.YELLOW)
-            self._auxAddMark(patient.values.inner_eye.right, 8, cs.YELLOW)
+            self._auxAddMark(patient.values.inner_eye.left, 8, cs.BLUE)
+            self._auxAddMark(patient.values.inner_eye.right, 8, cs.BLUE)
+            self._auxAddMark(patient.values.outer_eye.left, 8, cs.BLUE)
+            self._auxAddMark(patient.values.outer_eye.right, 8, cs.BLUE)
             self._auxAddMark(patient.values.cheekbone.left, 8, cs.GREEN)
             self._auxAddMark(patient.values.cheekbone.right, 8, cs.GREEN)
             self._auxAddMark(patient.values.nose.left, 8, cs.GREEN)
@@ -271,6 +290,17 @@ class FrontalWorkspace(Workspace):
             self._auxAddMark(patient.values.nose_center, 8, cs.GREEN)
             self._auxAddMark(patient.values.mouth.left, 8, cs.ORANGE)
             self._auxAddMark(patient.values.mouth.right, 8, cs.ORANGE)
-            self._auxAddMark(patient.values.cheek.left, 8, cs.BLACK)
-            self._auxAddMark(patient.values.cheek.right, 8, cs.BLACK)
+            self._auxAddMark(patient.values.cheek.left, 8, cs.ORANGE)
+            self._auxAddMark(patient.values.cheek.right, 8, cs.ORANGE)
+            self._auxAddMark(patient.values.malar.left, 8, cs.RED)
+            self._auxAddMark(patient.values.malar.right, 8, cs.RED)
             self.process_full_patient(patient)
+
+    def process_move(self, p):
+        x = self.order.get_next()
+        if x == FrontalOrder.HORIZONTAL_LINE:
+            self.remove_guideline()
+            self.create_guideline(p)
+
+    def reset_instance(self):
+        self.patient.values = FrontalFace()

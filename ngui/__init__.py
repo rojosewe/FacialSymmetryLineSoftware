@@ -1,10 +1,8 @@
 import sys
 import easygui as gui
 from utils.Messages import messages as ms
-from ngui.create_new_patient import new_patient_fill_info
-from ngui.load_patient import select_patient
 from workAreas.state_manager import State
-from ngui.db_exporter import export_db
+from ngui import create_new_patient, load_patient, db_exporter
 from utils.exceptions import LeftIncompleteException
 
 
@@ -15,11 +13,11 @@ def make_initial_selection():
                                                            ms["exit"]),
                           default_choice=ms["create_new_patient"], cancel_choice=ms["exit"])
     if action == 0:
-        new_patient_fill_info()
+        create_new_patient.new_patient_fill_info()
     elif action == 1:
-        select_patient()
+        load_patient.select_patient()
     elif action == 2:
-        export_db()
+        db_exporter.export_db()
     else:
         sys.exit()
 

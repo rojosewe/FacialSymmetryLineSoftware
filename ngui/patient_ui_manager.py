@@ -3,7 +3,7 @@ from workAreas.reference.axial import AxialReference
 from workAreas.reference.frontal import FrontalReference
 from workAreas.workspace import AxialWorkspace, FrontalWorkspace
 from facial_measures.order import AxialOrder, FrontalOrder
-from workAreas.proportions_table import AxialProportions, FrontalProportions
+from workAreas.proportions_table import AxialProportionsTable, FrontalProportionsTable
 from utils.Messages import messages as ms
 from utils import JsonLoader
 import tkinter as tk
@@ -96,7 +96,7 @@ class AxialPatientManager(PatientManager):
 
     def show_proportions(self):
         toplevel = tk.Toplevel()
-        AxialProportions().showProportions(toplevel, self.order.is_completed())
+        AxialProportionsTable().showProportions(toplevel, self.order.is_completed())
 
 
 class FrontalPatientManager(PatientManager):
@@ -109,4 +109,4 @@ class FrontalPatientManager(PatientManager):
 
     def show_proportions(self):
         toplevel = tk.Toplevel()
-        FrontalProportions().showProportions(toplevel, self.order.is_completed())
+        FrontalProportionsTable().showProportions(toplevel, self.order.is_completed())

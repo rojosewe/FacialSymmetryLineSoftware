@@ -1,4 +1,4 @@
-import easygui as gui
+from easygui import enterbox, indexbox, fileopenbox
 from facial_measures import AxialFace, FrontalFace, Patient
 from utils.Messages import messages as ms
 from utils.conf import Conf as cf
@@ -27,21 +27,21 @@ def new_patient_fill_info():
 
 
 def _record_name(patient):
-    name = gui.enterbox(ms["enter_info"], ms["patient_info"], patient.name)
+    name = enterbox(ms["enter_info"], ms["patient_info"], patient.name)
     if name is None:
         raise LeftIncompleteException
     patient.name = name
 
 
 def _record_age(patient):
-    age = gui.enterbox(ms["enter_patient_age"], ms["patient_age"], patient.age)
+    age = enterbox(ms["enter_patient_age"], ms["patient_age"], patient.age)
     if age is None:
         raise LeftIncompleteException
     patient.age = age
 
 
 def _record_gender(patient):
-    g = gui.indexbox(ms["gender"], choices=(ms["male"], ms["female"]))
+    g = indexbox(ms["gender"], choices=(ms["male"], ms["female"]))
     if g is None:
         raise LeftIncompleteException
     elif g == 0:
@@ -52,7 +52,7 @@ def _record_gender(patient):
 
 
 def _record_type(patient):
-    g = gui.indexbox(ms["type"], choices=(ms["frontal"], ms["axial"]))
+    g = indexbox(ms["type"], choices=(ms["frontal"], ms["axial"]))
     if g is None:
         raise LeftIncompleteException
     elif g == 0:
@@ -62,7 +62,7 @@ def _record_type(patient):
 
 
 def _record_image(patient):
-    img = gui.fileopenbox(ms["select_image"], ms["image_Selection"], default=cf.get("home_file"),
+    img = fileopenbox(ms["select_image"], ms["image_Selection"], default=cf.get("home_file"),
                           filetypes = [["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "IMAGE files"]])
     if img is None:
         raise LeftIncompleteException

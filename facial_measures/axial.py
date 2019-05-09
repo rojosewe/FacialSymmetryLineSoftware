@@ -12,7 +12,6 @@ class AxialFace:
         self.wall = SymmetryPoint()
         self.maxilar = SymmetryPoint()
         self.angles = Angles()
-        self.proportions = None
 
     def to_dict(self):
         return {
@@ -24,6 +23,9 @@ class AxialFace:
             "maxilar_left": self.maxilar.get_left(),
             "maxilar_right": self.maxilar.get_right()
         }
+
+    def calculate_additional(self):
+        pass
 
     def from_dict(self, d):
         self.central_point = Point.from_array(d["central_point"])
@@ -39,8 +41,7 @@ class AxialFace:
         return self.angles
 
     def get_proportions(self):
-        self.proportions = Proportions(self.get_angles())
-        return self.proportions
+        return Proportions(self.get_angles())
 
     def __str__(self):
         d = self.to_dict()
@@ -65,7 +66,7 @@ class Angles:
         self.nose_point_wall = SymmetryAngle(face.wall, face.point_nose, face.break_point)
         self.nose_point_maxilar = SymmetryAngle(face.maxilar, face.point_nose, face.break_point)
 
-    def get_lines(self, face, color=cs.BLACK, width= 2):
+    def get_lines(self, face, color=cs.BLACK, width=2):
         lines = []
         top = Point(face.central_point.x, 0)
         vertical_line = geometry.Line(face.central_point, top, color=cs.RED, w=width, dash=(4, 4))

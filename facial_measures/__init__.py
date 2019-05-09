@@ -43,15 +43,14 @@ class Patient:
     def complete_dict(self):
         self.calculate_proportions()
         d = self.to_dict()
-        d["axial"]["angles"] = self.values.angles.to_dict()
-        d["axial"]["proportions"] = self.values.proportions.to_dict()
+        d["values"]["angles"] = self.values.angles.to_dict()
+        d["values"]["proportions"] = self.values.angles.get_proportions().to_dict()
         for key in list(d["values"]["proportions"].keys()):
             d["values"]["proportions"][key + "_direction"] = "RIGHT" if d["values"]["proportions"][key] > 0 else "LEFT"
         return d
 
     def calculate_proportions(self):
         self.values.angles.calculate(self.values)
-        self.values.proportions.calculate(self.values, self.values.angles)
 
     def is_axial_patient(self):
         return self.type == Patient.AXIAL_TYPE

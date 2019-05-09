@@ -13,5 +13,5 @@ def export_db():
     if location is not None and not location.endswith(EXTENSION):
         location += EXTENSION
     patients = JsonLoader.get_all_patients()
-    writer = excel.AxialExcelWriter()
-    writer.patients_to_excel(patients, location)
+    excel_builder = excel.ExcelBuilder(patients, file_name=location)
+    excel_builder.write_patients()

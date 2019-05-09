@@ -18,6 +18,7 @@ def patient_to_json(patient):
         "key": patient.name + " - " + patient.type,
         "name": patient.name,
         "age": patient.age,
+        "type": patient.type,
         "gender": patient.gender,
         "photo": patient.photo,
         "values": patient.values.to_dict()
@@ -34,21 +35,22 @@ def load_patients(filepath=db_json_filepath):
 
 
 def get_all_patients_names():
-    return [from_key(key) for key in load_patients().keys()].sort()
+    patient_list = [from_key(key) for key in load_patients().keys()]
+    patient_list.sort()
+    return patient_list
 
 
 def get_all_patients():
-    return [get_patient(from_key(key)) for key in load_patients().keys()]
+    return [get_patient_by_name(from_key(key)) for key in load_patients().keys()]
 
 
-def get_patient(name):
+def get_patient_by_name(name):
     patients = load_patients()
     patient_dict = patients[to_key(name)]
-    patient = Patient(patient_dict["name"], patient_dict["age"], patient_dict["gender"], patient_dict["photo"])
+    patient = Patient(patient_dict["name"], patient_dict["age"], patient_dict["gender"], patient_dict["photo"],
+                      patient_dict["type"])
     try:
         patient.values.from_dict(patient_dict.get("values", None))
-        patient.values.angles.calculate(patient.values)
-        patient.values.proportions.calculate(patient.values, patient.values.angles)
     except KeyError:
         pass
     return patient

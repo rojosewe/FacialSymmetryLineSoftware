@@ -19,13 +19,15 @@ def select_patient():
 
 
 def _open_patient(name):
-    patient = JsonLoader.get_patient(name)
+    patient = JsonLoader.get_patient_by_name(name)
     set_patient(patient)
     _aux_open(patient)
 
 
 def _aux_open(patient):
     try:
+        patient.values.calculate_additional()
+        patient.values.angles.calculate(patient.values)
         if patient.is_axial_patient():
             AxialOrder.marked_order_as_completed(patient)
             patient_manager = AxialPatientManager()

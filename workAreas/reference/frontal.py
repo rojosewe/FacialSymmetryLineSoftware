@@ -21,7 +21,7 @@ class FrontalReference(Reference):
         self.img = os.path.join("files", "images", "reference.png")
         self.order = FrontalOrder
         self.pil_img = Image.open(self.img)
-        self.points = {FrontalOrder.TOP_HEAD: (94, 56), FrontalOrder.CHIN: (94, 228),
+        self.points = {FrontalOrder.CHIN: (94, 228),
                        FrontalOrder.FOREHEAD: (94, 105), FrontalOrder.EYE_OUTER_LEFT: (49, 117),
                        FrontalOrder.EYE_INNER_LEFT: (86, 113), FrontalOrder.EYE_INNER_RIGHT: (108, 113),
                        FrontalOrder.EYE_OUTER_RIGHT: (144, 117), FrontalOrder.CHEEKBONE_LEFT: (24, 134),
@@ -30,7 +30,7 @@ class FrontalReference(Reference):
                        FrontalOrder.MOUTH_LEFT: (72, 175), FrontalOrder.MOUTH_RIGHT: (119, 176),
                        FrontalOrder.CHEEK_LEFT: (42, 203), FrontalOrder.CHEEK_RIGHT: (149, 201)}
         self.text_keys = {FrontalOrder.HORIZONTAL_LINE: "horizontal_line",
-                          FrontalOrder.TOP_HEAD: "top_head", FrontalOrder.CHIN: "chin",
+                          FrontalOrder.CHIN: "chin",
                           FrontalOrder.FOREHEAD: "forehead", FrontalOrder.EYE_OUTER_LEFT: "eye_outer_left",
                           FrontalOrder.EYE_INNER_LEFT: "eye_inner_left",
                           FrontalOrder.EYE_INNER_RIGHT: "eye_outer_right",

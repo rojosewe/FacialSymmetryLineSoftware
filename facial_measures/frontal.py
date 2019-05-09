@@ -1,13 +1,13 @@
 import geometry
-from geometry import Point, SymmetryPoint, SymmetryAngle, SymmetryDisjointAngle
+from geometry import Point, SymmetryPoint, SymmetryAngle, SymmetrySidedAngle
 import utils.colors as cs
 
 
 class FrontalFace:
 
     def __init__(self):
+        self.guideline_point = None
         self.middle = None
-        self.upper = None
         self.chin = None
         self.nose_center = None
         self.cheekbone = SymmetryPoint()
@@ -18,7 +18,6 @@ class FrontalFace:
         self.inner_eye = SymmetryPoint()
         self.malar = SymmetryPoint()
         self.angles = Angles()
-        self.proportions = None
 
     @staticmethod
     def __calculate_malar(outer_eye, mouth, nose, cheekbone):
@@ -27,36 +26,39 @@ class FrontalFace:
         return geometry.intersects(malar_eye_line, malar_nose_line)
 
     def calculate_additional(self):
+        self.middle = Point((self.inner_eye.left.x + self.inner_eye.right.x)/2,
+                            (self.inner_eye.left.y + self.inner_eye.right.y)/ 2)
+
         self.malar.left = FrontalFace.__calculate_malar(self.outer_eye.left, self.mouth.left, self.nose.left,
-                                                           self.cheekbone.left)
+                                                        self.cheekbone.left)
         self.malar.right = FrontalFace.__calculate_malar(self.outer_eye.right, self.mouth.right, self.nose.right,
-                                                           self.cheekbone.right)
+                                                         self.cheekbone.right)
 
     def to_dict(self):
         return {
+            "guideline_point": self.guideline_point.get(),
             "middle": self.middle.get(),
-            "upper": self.upper.get(),
             "chin": self.chin.get(),
             "nose_center": self.nose_center.get(),
-            "outer_eye_left": self.outer_eye.left.get(),
             "inner_eye_left": self.inner_eye.left.get(),
-            "outer_eye_right": self.outer_eye.right.get(),
             "inner_eye_right": self.inner_eye.right.get(),
+            "outer_eye_left": self.outer_eye.left.get(),
+            "outer_eye_right": self.outer_eye.right.get(),
             "cheekbone_left": self.cheekbone.left.get(),
             "cheekbone_right": self.cheekbone.right.get(),
             "nose_left": self.nose.left.get(),
             "nose_right": self.nose.right.get(),
             "cheek_left": self.cheek.left.get(),
-            "cheek_right": self.cheek.left.get(),
+            "cheek_right": self.cheek.right.get(),
             "mouth_left": self.mouth.left.get(),
-            "mouth_right": self.mouth.left.get(),
+            "mouth_right": self.mouth.right.get(),
             "malar_left": self.malar.left.get(),
-            "malar_right": self.malar.left.get()
+            "malar_right": self.malar.right.get()
         }
 
     def from_dict(self, d):
+        self.guideline_point = Point.from_array(d["guideline_point"])
         self.middle = Point.from_array(d["middle"])
-        self.upper = Point.from_array(d["upper"])
         self.chin = Point.from_array(d["chin"])
         self.nose_center = Point.from_array(d["nose_center"])
         self.cheekbone.left = Point.from_array(d["cheekbone_left"])
@@ -66,11 +68,11 @@ class FrontalFace:
         self.mouth.left = Point.from_array(d["mouth_left"])
         self.mouth.right = Point.from_array(d["mouth_right"])
         self.nose.left = Point.from_array(d["nose_left"])
-        self.nose.left = Point.from_array(d["nose_right"])
-        self.outer_eye.left = Point.from_array(d["outer_eye_left"])
+        self.nose.right = Point.from_array(d["nose_right"])
         self.inner_eye.left = Point.from_array(d["inner_eye_left"])
-        self.outer_eye.right = Point.from_array(d["outer_eye_right"])
         self.inner_eye.right = Point.from_array(d["inner_eye_right"])
+        self.outer_eye.left = Point.from_array(d["outer_eye_left"])
+        self.outer_eye.right = Point.from_array(d["outer_eye_right"])
         self.malar.left = Point.from_array(d["malar_left"])
         self.malar.right = Point.from_array(d["malar_right"])
 
@@ -85,8 +87,7 @@ class FrontalFace:
         return self.angles
 
     def get_proportions(self):
-        self.proportions = Proportions(self.angles)
-        return self.proportions
+        return Proportions(self.angles)
 
 
 class Angles:
@@ -101,8 +102,8 @@ class Angles:
         self.cheek_chin = None
         self.mouth_chin = None
         self.cheekbone_chin = None
-        self.malar_nose_center = None
-        self.malar_eye = None
+
+        self.malar_vertical = None
         self.malar_internal_cant = None
         self.malar_nose = None
         self.nose_eye_outer = None
@@ -118,44 +119,36 @@ class Angles:
         self.cheek_chin = SymmetryAngle(points.cheek, points.chin, points.middle)
         self.mouth_chin = SymmetryAngle(points.mouth, points.chin, points.middle)
         self.cheekbone_chin = SymmetryAngle(points.cheekbone, points.chin, points.middle)
+        self.malar_vertical = SymmetryAngle(points.malar, points.chin, points.middle)
+        self.malar_internal_cant = SymmetrySidedAngle(points.inner_eye, points.malar, points.outer_eye)
+        self.malar_nose = SymmetrySidedAngle(points.nose, points.malar, points.outer_eye)
         y = geometry.Point(points.nose_center.x, 0)
-        self.malar_nose_center = SymmetryAngle(points.malar, points.nose_center, y)
-        self.malar_eye = SymmetryDisjointAngle(points.outer_eye.left, points.mouth.left,
-                                               points.chin, points.middle,
-                                               points.outer_eye.right, points.mouth.right,
-                                               points.chin, points.middle)
-        self.malar_internal_cant = SymmetryDisjointAngle(points.outer_eye.left, points.mouth.left,
-                                                         points.inner_eye.left, points.malar.left,
-                                                         points.outer_eye.right, points.mouth.right,
-                                                         points.inner_eye.right, points.malar.right)
-        self.malar_nose = SymmetryDisjointAngle(points.outer_eye.left, points.mouth.left,
-                                                points.nose.left, points.malar.left,
-                                                points.outer_eye.right, points.mouth.right,
-                                                points.nose.right, points.malar.right)
         self.nose_eye_outer = SymmetryAngle(points.outer_eye, points.nose_center, y)
         self.nose_eye_inner = SymmetryAngle(points.outer_eye, points.nose_center, y)
 
-    def get_lines(self, points, angles, color=cs.BLACK, width= 2):
+    def get_lines(self, face, color=cs.BLACK, width=2):
         upper_lines = []
         lower_lines = []
-        vertical_line = geometry.Line(points.middle, points.chin, color=color, w=width)
+        malar_lines = []
+        vertical_line = geometry.Line(face.middle, face.chin, color=color, w=width)
         upper_lines.append(vertical_line)
-        upper_lines += angles.outer_eye_middle.get_lines()
-        upper_lines += angles.inner_eye_middle.get_lines()
-        upper_lines += angles.nose_middle.get_lines()
-        upper_lines += angles.cheekbone_middle.get_lines()
-        upper_lines += angles.malar_nose_center.get_lines()
-        upper_lines += angles.malar_eye.get_lines()
-        upper_lines += angles.malar_internal_cant.get_lines()
-        upper_lines += angles.malar_nose.get_lines()
-        upper_lines += angles.nose_eye_outer.get_lines()
-        upper_lines += angles.nose_eye_inner.get_lines()
-        lower_lines += angles.cheek_middle.get_lines()
-        lower_lines += angles.mouth_middle.get_lines()
-        lower_lines += angles.cheek_chin.get_lines()
-        lower_lines += angles.mouth_chin.get_lines()
-        lower_lines += angles.cheekbone_chin.get_lines()
-        return upper_lines, lower_lines
+        upper_lines += self.outer_eye_middle.get_lines(color=cs.BLUE, width=width)
+        upper_lines += self.inner_eye_middle.get_lines(color=cs.BLUE, width=width)
+        upper_lines += self.nose_eye_outer.get_lines(color=cs.BLUE, width=width)
+        upper_lines += self.nose_eye_inner.get_lines(color=cs.BLUE, width=width)
+        upper_lines += self.nose_middle.get_lines(color=cs.GREEN, width=width)
+        upper_lines += self.cheekbone_middle.get_lines(color=cs.GREEN, width=width)
+
+        malar_lines += self.malar_vertical.get_lines(color=cs.RED, width=width)
+        malar_lines += self.malar_internal_cant.get_lines(color=cs.RED, width=width)
+        malar_lines += self.malar_nose.get_lines(color=cs.RED, width=width)
+
+        lower_lines += self.cheek_middle.get_lines(color=cs.ORANGE, width=width)
+        lower_lines += self.mouth_middle.get_lines(color=cs.ORANGE, width=width)
+        lower_lines += self.cheek_chin.get_lines(color=cs.ORANGE, width=width)
+        lower_lines += self.mouth_chin.get_lines(color=cs.ORANGE, width=width)
+        lower_lines += self.cheekbone_chin.get_lines(color=cs.ORANGE, width=width)
+        return upper_lines + malar_lines + lower_lines
 
     def __str__(self):
         return str(self.to_dict())

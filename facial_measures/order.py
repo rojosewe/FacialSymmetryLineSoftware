@@ -63,7 +63,7 @@ class AxialOrder(Order):
     MAXILAR_LEFT = "MAXILAR LEFT"
     MAXILAR_RIGHT = "MAXILAR RIGHT"
 
-    order = [CENTRAL_POINT, BREAK_POINT, WALL_RIGHT, WALL_LEFT, MAXILAR_RIGHT, MAXILAR_LEFT, POINT_NOSE]
+    order = [CENTRAL_POINT, BREAK_POINT, WALL_LEFT, WALL_RIGHT, MAXILAR_LEFT, MAXILAR_RIGHT, POINT_NOSE]
 
     to_process = order.copy()
     processed = []
@@ -75,10 +75,10 @@ class AxialOrder(Order):
             cls.CENTRAL_POINT: axial.central_point,
             cls.BREAK_POINT: axial.break_point,
             cls.POINT_NOSE: axial.point_nose,
-            cls.WALL_LEFT: axial.wall_left,
-            cls.WALL_RIGHT: axial.wall_right,
-            cls.MAXILAR_RIGHT: axial.maxilar_right,
-            cls.MAXILAR_LEFT: axial.maxilar_left
+            cls.WALL_LEFT: axial.wall.left,
+            cls.WALL_RIGHT: axial.wall.right,
+            cls.MAXILAR_RIGHT: axial.maxilar.right,
+            cls.MAXILAR_LEFT: axial.maxilar.left
         }
 
     @classmethod
@@ -92,7 +92,6 @@ class AxialOrder(Order):
 
 class FrontalOrder(Order):
     HORIZONTAL_LINE = "HORIZONTAL LINE"
-    TOP_HEAD = "TOP HEAD"
     CHIN = "CHIN"
     FOREHEAD = "FOREHEAD"
     EYE_OUTER_LEFT = "LEFT OUTER EYE"
@@ -109,7 +108,7 @@ class FrontalOrder(Order):
     CHEEK_LEFT = "LEFT CHEEK"
     CHEEK_RIGHT = "RIGHT CHEEK"
 
-    order = [HORIZONTAL_LINE, TOP_HEAD, CHIN, FOREHEAD,
+    order = [HORIZONTAL_LINE, CHIN,
              EYE_OUTER_LEFT, EYE_INNER_LEFT, EYE_INNER_RIGHT, EYE_OUTER_RIGHT,
              CHEEKBONE_LEFT, CHEEKBONE_RIGHT, NOSE_LEFT,
              NOSE_CENTER, NOSE_RIGHT, MOUTH_LEFT, MOUTH_RIGHT, CHEEK_LEFT, CHEEK_RIGHT]
@@ -121,13 +120,13 @@ class FrontalOrder(Order):
     def _return_face_map(cls, patient):
         frontal = patient.values
         return {
-            cls.TOP_HEAD: frontal.upper,
+            cls.HORIZONTAL_LINE: frontal.guideline_point,
             cls.CHIN: frontal.chin,
             cls.FOREHEAD: frontal.middle,
             cls.EYE_OUTER_LEFT: frontal.outer_eye.left,
             cls.EYE_INNER_LEFT: frontal.inner_eye.left,
             cls.EYE_INNER_RIGHT: frontal.inner_eye.right,
-            cls.EYE_OUTER_RIGHT: frontal.outer_eye.rught,
+            cls.EYE_OUTER_RIGHT: frontal.outer_eye.right,
             cls.CHEEKBONE_LEFT: frontal.cheekbone.left,
             cls.CHEEKBONE_RIGHT: frontal.cheekbone.right,
             cls.NOSE_LEFT: frontal.nose.left,

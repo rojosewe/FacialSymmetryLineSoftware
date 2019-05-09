@@ -10,3 +10,8 @@ files/old_dbs/
 files/conf.json
 *.pyc
 files/axial.json
+repl*
+files/old_dbs/*
+repl*
+files/patients.json
+files/patients_db.json
