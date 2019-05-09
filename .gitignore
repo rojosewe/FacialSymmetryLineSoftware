@@ -5,7 +5,16 @@
 __pycache__/
 .idea/
 files/patients.db
+files/patients.json
+files/old_dbs/
 files/conf.json
 *.pyc
+<<<<<<< HEAD
 files/old_dbs
 old_dbs/
+files/axial.json
+repl*
+files/old_dbs/*
+repl*
+files/patients.json
+files/patients_db.json
