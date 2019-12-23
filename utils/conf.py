@@ -25,10 +25,10 @@ class Conf:
         return key in Conf._conf
     
     @staticmethod
-    def get(key):
+    def get(key, default=None):
         if Conf._conf is None:
             Conf.loadConf()
-        return Conf._conf[key]
+        return Conf._conf.get(key, default)
     
     @staticmethod
     def set(key, value):

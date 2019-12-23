@@ -20,10 +20,12 @@ def new_patient_fill_info():
     saveImagePathAsHome(patient)
     if patient.is_axial_patient():
         patient.values = AxialFace()
-        AxialPatientManager().load()
+        manager = AxialPatientManager()
     else:
         patient.values = FrontalFace()
-        FrontalPatientManager().load()
+        manager = FrontalPatientManager()
+    manager.load()
+    manager.start()
 
 
 def _record_name(patient):

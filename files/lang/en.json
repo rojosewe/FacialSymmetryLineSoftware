@@ -39,6 +39,17 @@
   "show_lower_angles": "Show bottom angles",
   "show_lower_measures": "Show bottom measurements",
   "show_malar_measures": "Show malar points measures",
+
+  "show_malar_angles": "Show malar points angles",
+  "show_interocular_angles": "Show interocular angles",
+  "show_chin_angles": "Show mandibular angles",
+
+  "chin_angles": "Mandibular angles",
+  "interoculares_angles": "Interocular angles",
+  "malar_angles": "Malar point angles",
+  "main_measurement": "Main measurement",
+  "main_measurement_text": "Based on the measure radix - malar point, the bigger side is {} by {}.",
+
   "show_props": "Show Proportions",
   "measurements_props": "Displacement proportions",
   "internal_cant": "Canto Interno",
@@ -50,6 +61,7 @@
   "nasal_point": "Nasal point",
   "point_nose": "nasal tip",
   "mouth": "Comisura bucal",
+  "interocular": "Interocular point",
   "malar": "Malar point",
   "mandibular_angle": "Mandible angle",
   "angular_proportions": "Angular proportions",

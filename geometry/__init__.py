@@ -25,6 +25,7 @@ class Line:
         self.w = w
         self.dash = dash
         self.color = color
+        self.screen_ref = None
         if p2.x - p1.x == 0:
             self.slope = 0
         else:
@@ -45,7 +46,8 @@ class Mark:
         self.p = p
         self.r = r
         self.color = color
-        
+        self.screen_ref = None
+
     def get(self):
         return self.p.get()
     
@@ -142,6 +144,12 @@ class SymmetryAngle:
     def get_lines(self, color=cs.BLACK, width=2):
         return self.get_left_line(color, width), self.get_right_line(color, width)
 
+    def get_predominance_lines(self, predominant_color=cs.RED, under_color=cs.LIGHT, width=2):
+        if self.get_proportion() > 1.0:
+            return self.get_left_line(predominant_color, width), self.get_right_line(under_color, width)
+        else:
+            return self.get_right_line(predominant_color, width), self.get_left_line(under_color, width)
+
     def get_left_line(self, color=cs.BLACK, width=2):
         return Line(self.reference_point_main, self.symmetry_point.left, color=color, w=width)
 
@@ -167,6 +175,16 @@ class SymmetrySidedAngle:
 
     def get_proportion(self):
         return self.left_angle / self.right_angle
+
+    def get_predominance_lines(self, predominant_color=cs.RED, under_color=cs.LIGHT, width=2):
+        if self.get_proportion() > 1.0:
+            left_lines = self.get_left_lines(predominant_color, width)
+            right_lines = self.get_right_lines(under_color, width)
+            return [left_lines[0], left_lines[1], right_lines[0], right_lines[1]]
+        else:
+            left_lines = self.get_left_lines(under_color, width)
+            right_lines = self.get_right_lines(predominant_color, width)
+            return [right_lines[0], right_lines[1], left_lines[0], left_lines[1]]
 
     def get_lines(self, color=cs.BLACK, width=2):
         return self.get_left_lines(color, width) + self.get_right_lines(color, width)

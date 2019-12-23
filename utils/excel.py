@@ -123,8 +123,10 @@ class FrontalWriter(ExcelWriter):
         row_values += self._get_symmetry_angle_values(patient.values.angles.nose_eye_outer)
         row_values += self._get_symmetry_angle_values(patient.values.angles.nose_eye_inner)
         row_values += self._get_symmetry_angle_values(patient.values.angles.malar_nose)
-        row_values += self._get_symmetry_angle_values(patient.values.angles.malar_vertical)
+        row_values += self._get_symmetry_angle_values(patient.values.angles.malar_middle)
         row_values += self._get_symmetry_angle_values(patient.values.angles.malar_internal_cant)
+        row_values += self._get_symmetry_angle_values(patient.values.angles.malar_nose_point)
+        row_values += self._get_symmetry_angle_values(patient.values.angles.nose_nose_point)
         return row_values
 
     def write_col_names(self):
@@ -146,6 +148,8 @@ class FrontalWriter(ExcelWriter):
         _, start_col = self.write_symmetry_angle_label("nose_point", "eye_outer", start_row, start_col + 1)
         _, start_col = self.write_symmetry_angle_label("nose_point", "eye_inner", start_row, start_col + 1)
         _, start_col = self.write_symmetry_angle_label("malar", "nose", start_row, start_col + 1)
-        _, start_col = self.write_symmetry_angle_label("malar", "vertical", start_row, start_col + 1)
+        _, start_col = self.write_symmetry_angle_label("malar", "middle", start_row, start_col + 1)
         _, start_col = self.write_symmetry_angle_label("malar", "eye_inner", start_row, start_col + 1)
+        _, start_col = self.write_symmetry_angle_label("malar", "nose_point", start_row, start_col + 1)
+        _, start_col = self.write_symmetry_angle_label("nose", "nose_point", start_row, start_col + 1)
         return start_row, start_col

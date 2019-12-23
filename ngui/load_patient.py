@@ -26,15 +26,21 @@ def _open_patient(name):
 
 def _aux_open(patient):
     try:
-        patient.values.calculate_additional()
-        patient.values.angles.calculate(patient.values)
         if patient.is_axial_patient():
-            AxialOrder.marked_order_as_completed(patient)
+            order = AxialOrder
             patient_manager = AxialPatientManager()
         else:
-            FrontalOrder.marked_order_as_completed(patient)
+            order = FrontalOrder
             patient_manager = FrontalPatientManager()
-        return patient_manager.load()
+        patient_manager.load()
+        map = order._return_face_map(patient)
+        complete = False
+        for pos in order.order.copy():
+            point = map[pos]
+            if point is not None:
+                complete |= patient_manager.workspace.process_point_return_if_completed(point)
+                patient_manager.reference.process_click()
+        patient_manager.start()
     except FileNotFoundError:
         gui.msgbox(ms["error_on_img"].format(patient.photo))
         patient.photo = _load_select_image()
